@@ -10,6 +10,6 @@ def index():
 
 pcap = pyautogui.prompt("Enter path to pcap: ")
 val = "sudo tcpreplay -i eth1 " + pcap
-stream = os.popen(val
+stream = os.popen(val)
 out = stream.read()
 pyautogui.alert(out)
