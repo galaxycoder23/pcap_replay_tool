@@ -6,9 +6,9 @@ app = Flask(__name__)
 
 @app.route("/", methods=["GET","POST"])
 def index():
-  if request.method == "POST":
+	if request.method == "POST":
 		filepath = request.form["path"]
-  return render_template("index.html", path=path)
+	return render_template("index.html", path=path)
 
 #pcap = pyautogui.prompt("Enter path to pcap: ")
 #val = "sudo tcpreplay -i eth1 " + pcap
