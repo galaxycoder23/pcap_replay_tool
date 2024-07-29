@@ -4,12 +4,14 @@ from flask import Flask, render_template
 
 app = Flask(__name__)
 
-@app.route("/")
+@app.route("/", methods=["GET","POST")
 def index():
-  return render_template("index.html")
+  if request.method == "POST":
+		filepath = request.form["path"]
+  return render_template("index.html", path=path)
 
-pcap = pyautogui.prompt("Enter path to pcap: ")
-val = "sudo tcpreplay -i eth1 " + pcap
-stream = os.popen(val)
-out = stream.read()
-pyautogui.alert(out)
+#pcap = pyautogui.prompt("Enter path to pcap: ")
+#val = "sudo tcpreplay -i eth1 " + pcap
+#stream = os.popen(val)
+#out = stream.read()
+#pyautogui.alert(out)
