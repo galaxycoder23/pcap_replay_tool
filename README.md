@@ -4,7 +4,7 @@
 ```
 sudo python3 -m venv .venv
 . .venv/bin/activate
-pip install Flask
+sudo pip install Flask
 ```
 
 # Run app
