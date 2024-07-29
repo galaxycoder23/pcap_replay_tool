@@ -10,5 +10,8 @@
     <div class="interactive">
       <button type="submit" value="Send">Replay traffic</button>
     </div>
+     {% if path %}
+          <p class="path"><strong>Path:</strong> {{ error }}</p>
+    {% endif %}
   </body>
 </html>
