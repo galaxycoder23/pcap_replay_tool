@@ -6,10 +6,12 @@
   <body>
     <h1>PCAP upload</h1>
     <p>Replay traffic here:</p>
-    <input type="file" id="path" name="filename">
-    <div class="interactive">
-      <button type="submit" value="Send">Replay traffic</button>
-    </div>
+    <form action="" method="POST">
+      <input type="file" id="path" name="filename">
+      <div class="interactive">
+        <button type="submit" value="Send">Replay traffic</button>
+      </div>
+    </form>
     {% if path %}
       <p class="path"><strong>Path:</strong> {{ error }}</p>
     {% endif %}
