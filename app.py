@@ -8,7 +8,7 @@ app = Flask(__name__)
 def index():
 	path = None
 	if request.method == "POST":
-		filepath = request.form["filepath"]
+		path = request.form["filepath"]
 	return render_template("index.html", path=path)
 
 #pcap = pyautogui.prompt("Enter path to pcap: ")
