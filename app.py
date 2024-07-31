@@ -6,6 +6,7 @@ app = Flask(__name__)
 
 @app.route("/", methods=["GET","POST"])
 def index():
+	path = None
 	if request.method == "POST":
 		filepath = request.form["filepath"]
 	return render_template("index.html", path=path)
