@@ -7,13 +7,13 @@
     <h1>PCAP upload</h1>
     <p>Replay traffic here:</p>
     <form action="" method="POST">
-      <input type="file" id="path" name="path">
+      <input type="file" id="filepath" name="filepath">
       <div class="interactive">
         <button type="submit" value="Send">Replay traffic</button>
       </div>
     </form>
     {% if path %}
-      <p class="path"><strong>Path:</strong> {{ error }}</p>
+      <p id="path" class="path"><strong>Path:</strong> {{ error }}</p>
     {% endif %}
   </body>
 </html>
