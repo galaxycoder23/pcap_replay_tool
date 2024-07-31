@@ -1,8 +1,7 @@
+from tempfile import NamedTemporaryFile
 import streamlit as st
-    
-f = st.file_uploader("Upload a file", type=(["pcap"]))
-if f is not None:
-	path_in = f.name
-	print(path_in)
-else:
-  path_in = None
+
+uploaded_file = st.file_uploader("File upload", type='pcap')
+with NamedTemporaryFile(dir='.', suffix='.csv') as f:
+    f.write(uploaded_file.getbuffer())
+    print(f.name)
