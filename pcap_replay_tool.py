@@ -37,6 +37,6 @@ if st.button("Start PCAP replay"):
 	st.write(out)
 
 if st.button("Stop PCAP replay", type="primary"):
-	stream = os.popen("exit")
-	out = stream.read()
-	st.write(out)
+	stream2 = os.popen("ps aux | grep \"tcpreplay\"")
+	out2 = stream2.read()
+	st.write(out2)
