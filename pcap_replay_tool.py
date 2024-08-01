@@ -13,13 +13,8 @@ def stream_data():
         time.sleep(0.02)
 st.write_stream(stream_data)
 
-def file_selector(folder_path="../.."):
-    filenames = os.listdir(folder_path)
-    selected_filename = st.selectbox('Select a PCAP to replay:', filenames)
-    return os.path.join(folder_path, selected_filename)
-
-st.subheader("Choose PCAP:")
-filename = file_selector()
+st.subheader("Upload PCAP:")
+file = st.file_uploader("Upload a file", type=(["pcap"]))
 
 st.write("---")
 
