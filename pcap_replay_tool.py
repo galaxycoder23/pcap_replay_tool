@@ -2,16 +2,18 @@ import streamlit as st
 import time
 import os
 import subprocess
+import paramiko
 
 st.title("PCAP replay tool")
 subtitle = "Replay PCAPs using tcpreplay"
+
 def stream_data():
     for character in list(subtitle):
         yield character + ""
         time.sleep(0.02)
 st.write_stream(stream_data)
 
-def file_selector(folder_path='../..'):
+def file_selector(folder_path="../.."):
     filenames = os.listdir(folder_path)
     selected_filename = st.selectbox('Select a PCAP to replay:', filenames)
     return os.path.join(folder_path, selected_filename)
@@ -27,16 +29,32 @@ replay_speed = st.slider("How many packets would you like to replay per second?"
 st.write("---")
 
 st.subheader("Command you are running: ")
-command = "sudo tcpreplay -i eth1 -vv " + "-p " + str(replay_speed) + " " + filename
-st.code(command, language="bash")
-	
-def replayTraffic():
+replay_command = "sudo tcpreplay -i eth1 -vv " + "-p " + str(replay_speed) + " " + filename
+st.code(replay_command, language="bash")
+
+def replayTraffic(ssh):
 	global traffic_replay
-	traffic_replay = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+	stdin, stdout, stderr = ssh.exec_command(replay_command)
+	traffic_replay = stdout.channel
+	
+def stopTraffic(ssh):
+	if "traffic_replay" in globals():  
+        	ssh.exec_command(f"sudo kill {traffic_replay.get_id()}")
+
+# SSH credentials
+ssh_host = st.secrets["ip-address"]
+ssh_port = 22  
+ssh_user = st.secrets["username"]
+ssh_password = st.secrets["password"]  
+
+ssh = paramiko.SSHClient()  
+ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # what does this do
+ssh.connect(ssh_host, port=ssh_port, username=ssh_user, password=ssh_password)
 		
 if st.button("Start PCAP replay"):
-	replayTraffic()
+	replayTraffic(ssh)
 
 if st.button("Stop PCAP replay", type="primary"):
-	if "traffic_replay" in globals():  
-        	os.kill(traffic_replay.pid, signal.SIGINT)  
+	stopTraffic(ssh)
+
+ssh.close()
