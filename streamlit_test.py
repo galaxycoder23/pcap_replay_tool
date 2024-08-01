@@ -3,7 +3,7 @@ import time
 import os
 
 st.title("PCAP replay tool")
-subtitle = "Replay PCAPs"
+subtitle = "Replay PCAPs using tcpreplay"
 def stream_data():
     for character in list(subtitle):
         yield character + ""
