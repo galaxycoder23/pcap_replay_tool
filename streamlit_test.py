@@ -3,7 +3,7 @@ import os
 
 def file_selector(folder_path='../..'):
     filenames = os.listdir(folder_path)
-    selected_filename = st.selectbox('Select a PCAP to upload:', filenames)
+    selected_filename = st.selectbox('Select a PCAP to replay:', filenames)
     return os.path.join(folder_path, selected_filename)
 
 filename = file_selector()
