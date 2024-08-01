@@ -1,12 +1,14 @@
 # GUI tool for PCAP replay
 
-# Installation
-``` bash
-sudo pip install streamlit
-streamlit hello
+# Installation for Windows
+```
+py -m pip install streamlit
+py -m streamlit hello
+
+py -m pip install paramiko
 ```
 
 # Run app
-``` bash
-streamlit run pcap_replay_tool.py
+```
+py -m streamlit run pcap_replay_tool.py
 ```
