@@ -18,3 +18,6 @@ command = "sudo tcpreplay -i eth1 " + "-p " + str(replay_speed) + " " + filename
 stream = os.popen(command)
 out = stream.read()
 st.write(out)
+
+st.button("Start PCAP replay")
+st.button("Stop PCAP replay", type="primary")
