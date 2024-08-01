@@ -10,5 +10,5 @@ filename = file_selector()
 #st.write('You selected `%s`' % filename)
 
 st.subheader("PCAP replay speed (in pps)")
-replay_speed = st.slider("What speed would you like to replay the pcap at?", 0.25, 200, 25)
+replay_speed = st.slider("What speed would you like to replay the pcap at?", 0.25, 200.0, 25.0)
 
