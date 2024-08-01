@@ -32,7 +32,7 @@ st.code(command, language="bash")
 	
 def replayTraffic():
 	global traffic_replay
-	traffic_replay = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	traffic_replay = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
 		
 if st.button("Start PCAP replay"):
 	replayTraffic()
