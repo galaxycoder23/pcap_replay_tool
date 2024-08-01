@@ -33,8 +33,7 @@ st.code(command, language="bash")
 	
 def replayTraffic(cmd):
 	out = subprocess.Popen(cmd, shell=True)
-	st.write(out)
-
+	
 	if st.button("Stop PCAP replay", type="primary"):
 		os.kill(out.pid, signal.SIGINT)
 		
