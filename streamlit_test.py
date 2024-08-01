@@ -2,7 +2,12 @@ import streamlit as st
 import os
 
 st.title("PCAP replay tool")
-st.write_stream("Replay PCAPs")
+subtitle = "Replay PCAPs"
+def stream_data():
+    for character in subtitle.split(""):
+        yield character + ""
+        time.sleep(0.02)
+st.write_stream(stream_data)
 
 def file_selector(folder_path='../..'):
     filenames = os.listdir(folder_path)
