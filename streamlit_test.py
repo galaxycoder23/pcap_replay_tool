@@ -13,6 +13,6 @@ st.subheader("PCAP replay speed (in pps)")
 replay_speed = st.slider("How many packets would you like to replay per second?", 0.25, 200.0, 25.0)
 
 command = "sudo tcpreplay -i eth1 " + "-p " + str(replay_speed) + " " + filename
-stream = os.popen(val)
+stream = os.popen(command)
 out = stream.read()
 st.write(out)
