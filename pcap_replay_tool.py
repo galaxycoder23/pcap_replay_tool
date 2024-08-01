@@ -35,7 +35,7 @@ def replayTraffic():
 	traffic_replay = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 		
 if st.button("Start PCAP replay"):
-	replayTraffic(command)
+	replayTraffic()
 
 if st.button("Stop PCAP replay", type="primary"):
 	os.kill(out.pid, signal.SIGINT)
