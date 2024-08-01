@@ -28,6 +28,7 @@ st.write("---")
 
 st.subheader("Command you are running: ")
 remote_path = "/packet_captures/" + filename
+st.write(remote_path)
 replay_command = "sudo tcpreplay -i eth1 -vv " + "-p " + str(replay_speed) + " " + remote_path
 st.code(replay_command, language="bash")
 
