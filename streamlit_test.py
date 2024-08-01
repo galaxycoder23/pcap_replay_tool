@@ -7,6 +7,7 @@ def file_selector(folder_path='../..'):
     selected_filename = st.selectbox('Select a PCAP to replay:', filenames)
     return os.path.join(folder_path, selected_filename)
 
+st.subheader("Choose PCAP:")
 filename = file_selector()
 #st.write('You selected `%s`' % filename)
 
