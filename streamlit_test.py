@@ -4,7 +4,7 @@ import os
 st.title("PCAP replay tool")
 subtitle = "Replay PCAPs"
 def stream_data():
-    for character in subtitle.split(""):
+    for character in list(subtitle):
         yield character + ""
         time.sleep(0.02)
 st.write_stream(stream_data)
