@@ -24,7 +24,7 @@ replay_speed = st.slider("How many packets would you like to replay per second?"
 
 # Optional code ----------------------------------------------------
 st.subheader("Command you are running: ")
-command = "sudo tcpreplay -i eth1 " + "-p " + str(replay_speed) + " " + filename
+command = "sudo tcpreplay -i eth1 -vv " + "-p " + str(replay_speed) + " " + filename
 st.code(command, language="bash")
 
 # ------------------------------------------------------------------
