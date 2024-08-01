@@ -1,6 +1,7 @@
 import streamlit as st
 import os
 
+st.title("PCAP replay tool")
 def file_selector(folder_path='../..'):
     filenames = os.listdir(folder_path)
     selected_filename = st.selectbox('Select a PCAP to replay:', filenames)
