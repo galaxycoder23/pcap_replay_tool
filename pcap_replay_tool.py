@@ -31,10 +31,11 @@ st.subheader("Command you are running: ")
 command = "sudo tcpreplay -i eth1 -vv " + "-p " + str(replay_speed) + " " + filename
 st.code(command, language="bash")
 
+out = subprocess.Popen()
 if st.button("Start PCAP replay"):
 	command = "sudo tcpreplay -i eth1 " + "-p " + str(replay_speed) + " " + filename
-	out = subprocess.Popen(command, shell=True)
+	out = subprocess.Popen(command)
 	st.write(out)
 
-	if st.button("Stop PCAP replay", type="primary"):
-		out.sendsignal(signal.SIGINT)
+if st.button("Stop PCAP replay", type="primary"):
+	os.kill(out.pid, signal.SIGINT)  
