@@ -16,8 +16,7 @@ st.write_stream(stream_data)
 
 st.subheader("Upload PCAP:")
 file = st.file_uploader("Upload a file", type=(["pcap"]))
-if file is not None:
-	filename = file.name
+filename = file.name
 
 st.write("---")
 
