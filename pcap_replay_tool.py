@@ -3,18 +3,21 @@ import time
 import os
 import subprocess
 import paramiko
+from scp import SCPClient
 
 st.title("PCAP replay tool")
 subtitle = "Replay PCAPs using tcpreplay"
 
 def stream_data():
-    for character in list(subtitle):
-        yield character + ""
-        time.sleep(0.02)
+	for character in list(subtitle):
+		yield character + ""
+		time.sleep(0.02)
 st.write_stream(stream_data)
 
 st.subheader("Upload PCAP:")
 file = st.file_uploader("Upload a file", type=(["pcap"]))
+if file is not None:
+	filename = file.name
 
 st.write("---")
 
@@ -24,7 +27,8 @@ replay_speed = st.slider("How many packets would you like to replay per second?"
 st.write("---")
 
 st.subheader("Command you are running: ")
-replay_command = "sudo tcpreplay -i eth1 -vv " + "-p " + str(replay_speed) + " " + filename
+remote_path = "/packet_captures/" + filename
+replay_command = "sudo tcpreplay -i eth1 -vv " + "-p " + str(replay_speed) + " " + remote_path
 st.code(replay_command, language="bash")
 
 def replayTraffic(ssh):
@@ -45,6 +49,9 @@ ssh_password = st.secrets["password"]
 ssh = paramiko.SSHClient()  
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # what does this do
 ssh.connect(ssh_host, port=ssh_port, username=ssh_user, password=ssh_password)
+
+with SCPClient(ssh.get_transport()) as scp:
+	scp.put(file, remote_path)
 		
 if st.button("Start PCAP replay"):
 	replayTraffic(ssh)
