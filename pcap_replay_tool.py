@@ -1,6 +1,7 @@
 import streamlit as st
 import time
 import os
+import subprocess
 
 st.title("PCAP replay tool")
 subtitle = "Replay PCAPs using tcpreplay"
@@ -29,13 +30,14 @@ st.write("---")
 st.subheader("Command you are running: ")
 command = "sudo tcpreplay -i eth1 -vv " + "-p " + str(replay_speed) + " " + filename
 st.code(command, language="bash")
-
-out = None
-
-if st.button("Start PCAP replay"):
+	
+def replayTraffic():
 	command = "sudo tcpreplay -i eth1 " + "-p " + str(replay_speed) + " " + filename
-	out = os.popen(command)
+	out = subprocess.Popen(command)
 	st.write(out)
 
 	if st.button("Stop PCAP replay", type="primary"):
 		os.kill(out.pid, signal.SIGINT)
+		
+if st.button("Start PCAP replay"):
+	replayTraffic()
