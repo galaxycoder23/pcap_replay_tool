@@ -19,16 +19,16 @@ st.subheader("Choose PCAP:")
 filename = file_selector()
 #st.write('You selected `%s`' % filename)
 
+st.write("---")
+
 st.subheader("PCAP replay speed (in pps)")
 replay_speed = st.slider("How many packets would you like to replay per second?", 0.25, 200.0, 25.0)
 
-# Optional code ----------------------------------------------------
+st.write("---")
+
 st.subheader("Command you are running: ")
 command = "sudo tcpreplay -i eth1 -vv " + "-p " + str(replay_speed) + " " + filename
 st.code(command, language="bash")
-
-# ------------------------------------------------------------------
-
 
 if st.button("Start PCAP replay"):
 	command = "sudo tcpreplay -i eth1 " + "-p " + str(replay_speed) + " " + filename
@@ -37,7 +37,6 @@ if st.button("Start PCAP replay"):
 	st.write(out)
 
 if st.button("Stop PCAP replay", type="primary"):
-	command = "exit"
-	stream = os.popen(command)
+	stream = os.popen("exit")
 	out = stream.read()
 	st.write(out)
