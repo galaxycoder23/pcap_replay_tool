@@ -32,7 +32,7 @@ command = "sudo tcpreplay -i eth1 -vv " + "-p " + str(replay_speed) + " " + file
 st.code(command, language="bash")
 	
 def replayTraffic(cmd):
-	out = subprocess.Popen(cmd)
+	out = subprocess.Popen(cmd, shell=True)
 	st.write(out)
 
 	if st.button("Stop PCAP replay", type="primary"):
