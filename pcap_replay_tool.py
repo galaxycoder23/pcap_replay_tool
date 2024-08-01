@@ -38,5 +38,5 @@ if st.button("Start PCAP replay"):
 	replayTraffic()
 
 if st.button("Stop PCAP replay", type="primary"):
-	if traffic_replay in globals():  
+	if "traffic_replay" in globals():  
         	os.kill(traffic_replay.pid, signal.SIGINT)  
