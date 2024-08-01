@@ -6,6 +6,8 @@ py -m pip install streamlit
 py -m streamlit hello
 
 py -m pip install paramiko
+
+py -m pip install scp
 ```
 
 # Run app
