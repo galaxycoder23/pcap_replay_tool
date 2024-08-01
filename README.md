@@ -1,14 +1,12 @@
-# GUI for PCAP replay
+# GUI tool for PCAP replay
 
-# Virtual env and installing Flask
+# Installation
 ```
-sudo python3 -m venv .venv
-. .venv/bin/activate
-sudo pip install Flask
+sudo pip install streamlit
+streamlit hello
 ```
 
 # Run app
 ```
-flask --app app run # localhost
-flask --app app run --host=0.0.0.0 # accessible
+streamlit run pcap_replay_tool.py
 ```
