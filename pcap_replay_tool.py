@@ -37,5 +37,5 @@ if st.button("Start PCAP replay"):
 	out = os.popen(command)
 	st.write(out)
 
-if st.button("Stop PCAP replay", type="primary") and out!= None:
-	os.kill(out.pid, signal.SIGINT)
+	if st.button("Stop PCAP replay", type="primary"):
+		os.kill(out.pid, signal.SIGINT)
