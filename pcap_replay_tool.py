@@ -21,7 +21,7 @@ file = st.file_uploader("Upload a file", type=(["pcap"]))
 
 if file:
 	filename = file.name
-	remote_path = "/packet_captures/" + filename
+	remote_path = "~/packet_captures/" + filename
 
 st.write("---")
 st.subheader("PCAP replay speed (in pps)")
@@ -54,6 +54,7 @@ ssh.connect(ssh_host, port=ssh_port, username=ssh_user, password=ssh_password)
 
 with SCPClient(ssh.get_transport()) as scp:
 	scp.put(file, remote_path)
+	#"C:/Users/<username>/Downloads/<filepath>"
 		
 if st.button("Start PCAP replay"):
 	replayTraffic(ssh)
