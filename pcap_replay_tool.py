@@ -16,19 +16,19 @@ st.write_stream(stream_data)
 
 st.subheader("Upload PCAP:")
 filename = None
+remote_path = None
 file = st.file_uploader("Upload a file", type=(["pcap"]))
+
 if file:
-   filename = file.name
+	filename = file.name
+	remote_path = "/packet_captures/" + filename
 
 st.write("---")
-
 st.subheader("PCAP replay speed (in pps)")
 replay_speed = st.slider("How many packets would you like to replay per second?", 0.25, 200.0, 25.0)
-
 st.write("---")
 
 st.subheader("Command you are running: ")
-remote_path = "/packet_captures/" + filename
 st.write(remote_path)
 replay_command = "sudo tcpreplay -i eth1 -vv " + "-p " + str(replay_speed) + " " + remote_path
 st.code(replay_command, language="bash")
@@ -40,7 +40,7 @@ def replayTraffic(ssh):
 	
 def stopTraffic(ssh):
 	if "traffic_replay" in globals():  
-        	ssh.exec_command(f"sudo kill {traffic_replay.get_id()}")
+		ssh.exec_command(f"sudo kill {traffic_replay.get_id()}")
 
 # SSH credentials
 ssh_host = st.secrets["ip-address"]
