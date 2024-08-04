@@ -2,12 +2,8 @@
 
 # Installation for Windows
 ```
-py -m pip install streamlit
+py -m pip install -r requirements.txt
 py -m streamlit hello
-
-py -m pip install paramiko
-
-py -m pip install scp
 ```
 
 # Run app
