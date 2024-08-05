@@ -27,7 +27,7 @@ if file_upload:
 	filename = file_upload.name
 	with open(filename, 'wb') as f: 
 		f.write(file_upload.getvalue()) # For uploaded file as bytes
-	remote_path = "~/packet_captures/" + filename
+	remote_path = "~/Documents/packet_captures/" + filename
 
 
 # Adjust replay speed
