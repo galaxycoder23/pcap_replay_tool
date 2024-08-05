@@ -5,6 +5,7 @@ import paramiko # SSH from Python app
 from scp import SCPClient # SCP
 import threading # For multi-threading
 
+
 st.title("PCAP replay tool")
 
 subtitle = "Replay PCAPs using tcpreplay"
@@ -87,7 +88,8 @@ def replay_traffic(ssh):
 		traffic_replay = stdout.channel
 	finally:
 		ssh.close()
-	
+
+
 if st.button("Start PCAP replay"):
 	replay_traffic(ssh)
 
@@ -97,6 +99,6 @@ def stop_traffic(ssh):
 	if "traffic_replay" in globals():
 		ssh.exec_command(f"sudo kill {traffic_replay.get_id()}")
 	ssh.close()
-	
+
 if st.button("Stop PCAP replay", type="primary"):
 	stop_traffic(ssh)
