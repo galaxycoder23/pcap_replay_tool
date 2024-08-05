@@ -21,9 +21,10 @@ st.subheader("Upload PCAP:")
 filename = None
 remote_path = None
 
-file = st.file_uploader("Upload a file", type=(["pcap"]))
-if file:
-	filename = file.name
+file_upload = st.file_uploader("Upload a file", type=(["pcap"]))
+if file_upload:
+	with open(filename, 'wb') as f: 
+		f.write(file_upload)
 	remote_path = "~/packet_captures/" + filename
 
 
@@ -51,17 +52,16 @@ ssh = paramiko.SSHClient()
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # Automatically adds the hostname and new host key to the local HostKeys object, and saves it
 
 def print_stream(stream, identifier):  
-    for line in iter(stream.readline, ''):  
-        if line:  
-            print(f"{identifier}: {line.strip()}")  
-        else:  
-            break
+	for line in iter(stream.readline, ''):  
+	if line:
+		print(f"{identifier}: {line.strip()}")
+	else:  
+    break
 
 # SCP to transfer PCAP
-def upload_file_to_remote(name, remote):
-        with SCPClient(ssh.get_transport()) as scp:
-                full_local_path = st.secrets["filepath"] + name
-                scp.put(full_local_path, remote)
+def upload_file_to_remote(local_file, remote_directory):
+	with SCPClient(ssh.get_transport()) as scp:
+		scp.put(local_file, remote_directory)
 
 # Replay traffic
 def replay_traffic(ssh):
@@ -89,9 +89,9 @@ def replay_traffic(ssh):
 	finally:
 		ssh.close()
 
-
 if st.button("Start PCAP replay"):
 	replay_traffic(ssh)
+
 
 # Stop replay of traffic
 def stop_traffic(ssh):
