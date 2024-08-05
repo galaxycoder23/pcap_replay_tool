@@ -53,9 +53,10 @@ ssh.connect(ssh_host, port=ssh_port, username=ssh_user, password=ssh_password)
 
 # SCP to transfer PCAP
 with SCPClient(ssh.get_transport()) as scp:
-	scp.put(file, remote_path)
+	full_local_path = st.secrets["filepath"] + filename
+	scp.put(full_local_path, remote_path)
 	# Example Windows filepath: "C:/Users/<username>/Downloads/<filepath>"
-		
+
 
 # Replay traffic
 def replay_traffic(ssh):
