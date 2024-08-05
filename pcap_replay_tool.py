@@ -58,19 +58,19 @@ with SCPClient(ssh.get_transport()) as scp:
 		
 
 # Replay traffic
-def replayTraffic(ssh):
+def replay_traffic(ssh):
 	global traffic_replay
 	stdin, stdout, stderr = ssh.exec_command(replay_command)
 	traffic_replay = stdout.channel
 if st.button("Start PCAP replay"):
-	replayTraffic(ssh)
+	replay_traffic(ssh)
 
 # Stop replay of traffic
-def stopTraffic(ssh):
+def stop_traffic(ssh):
 	if "traffic_replay" in globals():  
 		ssh.exec_command(f"sudo kill {traffic_replay.get_id()}")
 if st.button("Stop PCAP replay", type="primary"):
-	stopTraffic(ssh)
+	stop_traffic(ssh)
 
 
 ssh.close() # Closes SSH connection
