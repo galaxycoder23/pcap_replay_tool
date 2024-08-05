@@ -18,14 +18,14 @@ st.write_stream(stream_data)
 
 # Allow user to upload PCAP file
 st.subheader("Upload PCAP:")
-filename = None
+file_upload = None
 remote_path = None
 
 file_upload = st.file_uploader("Upload a file", type=(["pcap"]))
 if file_upload:
-	with open(filename, 'wb') as f: 
+	with open(file_upload, 'wb') as f: 
 		f.write(file_upload)
-	remote_path = "~/packet_captures/" + filename
+	remote_path = "~/packet_captures/" + file_upload
 
 
 # Adjust replay speed
@@ -67,7 +67,7 @@ def upload_file_to_remote(local_file, remote_directory):
 def replay_traffic(ssh):
 	try:
 		ssh.connect(ssh_host, port=ssh_port, username=ssh_user, password=ssh_password)
-		upload_file_to_remote(filename, remote_path)
+		upload_file_to_remote(file_upload, remote_path)
 		global traffic_replay
 		stdin, stdout, stderr = ssh.exec_command(replay_command)
 		stdin.write(st.secrets["password"]+"\n")
