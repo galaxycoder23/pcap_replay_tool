@@ -4,10 +4,11 @@ import time # Used for the typewriter effect
 import paramiko # SSH from Python app
 from scp import SCPClient # SCP
 import threading # For multi-threading
-
+import os # For use in deleting files
 
 st.title("PCAP replay tool")
 
+# Subtitle and typewriter formatting
 subtitle = "Replay PCAPs using tcpreplay"
 def stream_data():
 	for character in list(subtitle):
@@ -18,13 +19,14 @@ st.write_stream(stream_data)
 
 # Allow user to upload PCAP file
 st.subheader("Upload PCAP:")
+file_upload = None
 filename = None
 remote_path = None
 
-file = st.file_uploader("Upload a file", type=(["pcap"]))
-if file:
-	filename = file.name
-	remote_path = "~/packet_captures/" + filename
+file_upload = st.file_uploader("Upload a file", type=(["pcap"]))
+if file_upload:
+	filename = file_upload.name
+	remote_path = "~/Documents/packet_captures/" + filename
 
 
 # Adjust replay speed
@@ -51,21 +53,22 @@ ssh = paramiko.SSHClient()
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # Automatically adds the hostname and new host key to the local HostKeys object, and saves it
 
 def print_stream(stream, identifier):  
-    for line in iter(stream.readline, ''):  
-        if line:  
-            print(f"{identifier}: {line.strip()}")  
-        else:  
-            break
+	for line in iter(stream.readline, ''):
+		if line:
+			print(f"{identifier}: {line.strip()}")
+		else:  
+    			break
 
 # SCP to transfer PCAP
-def upload_file_to_remote(name, remote):
-        with SCPClient(ssh.get_transport()) as scp:
-                full_local_path = st.secrets["filepath"] + name
-                scp.put(full_local_path, remote)
+def upload_file_to_remote(local_file, remote_directory):
+	with SCPClient(ssh.get_transport()) as scp:
+		scp.put(local_file, remote_directory)
 
 # Replay traffic
 def replay_traffic(ssh):
 	try:
+		with open(filename, 'wb') as f: 
+			f.write(file_upload.getvalue()) # For uploaded file as bytes
 		ssh.connect(ssh_host, port=ssh_port, username=ssh_user, password=ssh_password)
 		upload_file_to_remote(filename, remote_path)
 		global traffic_replay
@@ -87,17 +90,21 @@ def replay_traffic(ssh):
 		
 		traffic_replay = stdout.channel
 	finally:
+		if os.path.exists(filename):
+			os.remove(filename)
 		ssh.close()
-
 
 if st.button("Start PCAP replay"):
 	replay_traffic(ssh)
+
 
 # Stop replay of traffic
 def stop_traffic(ssh):
 	ssh.connect(ssh_host, port=ssh_port, username=ssh_user, password=ssh_password)
 	if "traffic_replay" in globals():
 		ssh.exec_command(f"sudo kill {traffic_replay.get_id()}")
+	if os.path.exists(filename):
+		os.remove(filename)
 	ssh.close()
 
 if st.button("Stop PCAP replay", type="primary"):
