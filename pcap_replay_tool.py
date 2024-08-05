@@ -90,7 +90,8 @@ def replay_traffic(ssh):
 		
 		traffic_replay = stdout.channel
 	finally:
-		os.remove(filename)
+		if os.path.exists(filename):
+			os.remove(filename)
 		ssh.close()
 
 if st.button("Start PCAP replay"):
@@ -102,7 +103,8 @@ def stop_traffic(ssh):
 	ssh.connect(ssh_host, port=ssh_port, username=ssh_user, password=ssh_password)
 	if "traffic_replay" in globals():
 		ssh.exec_command(f"sudo kill {traffic_replay.get_id()}")
-	os.remove(filename)
+	if os.path.exists(filename):
+		os.remove(filename)
 	ssh.close()
 
 if st.button("Stop PCAP replay", type="primary"):
