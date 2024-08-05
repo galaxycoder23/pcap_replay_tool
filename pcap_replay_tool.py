@@ -4,6 +4,7 @@ import time # Used for the typewriter effect
 import paramiko # SSH from Python app
 from scp import SCPClient # SCP
 import threading # For multi-threading
+import os # For use in deleting files
 
 st.title("PCAP replay tool")
 
@@ -25,8 +26,6 @@ remote_path = None
 file_upload = st.file_uploader("Upload a file", type=(["pcap"]))
 if file_upload:
 	filename = file_upload.name
-	with open(filename, 'wb') as f: 
-		f.write(file_upload.getvalue()) # For uploaded file as bytes
 	remote_path = "~/Documents/packet_captures/" + filename
 
 
@@ -68,6 +67,8 @@ def upload_file_to_remote(local_file, remote_directory):
 # Replay traffic
 def replay_traffic(ssh):
 	try:
+		with open(filename, 'wb') as f: 
+			f.write(file_upload.getvalue()) # For uploaded file as bytes
 		ssh.connect(ssh_host, port=ssh_port, username=ssh_user, password=ssh_password)
 		upload_file_to_remote(filename, remote_path)
 		global traffic_replay
@@ -89,6 +90,7 @@ def replay_traffic(ssh):
 		
 		traffic_replay = stdout.channel
 	finally:
+		os.remove(filename)
 		ssh.close()
 
 if st.button("Start PCAP replay"):
@@ -100,6 +102,7 @@ def stop_traffic(ssh):
 	ssh.connect(ssh_host, port=ssh_port, username=ssh_user, password=ssh_password)
 	if "traffic_replay" in globals():
 		ssh.exec_command(f"sudo kill {traffic_replay.get_id()}")
+	os.remove(filename)
 	ssh.close()
 
 if st.button("Stop PCAP replay", type="primary"):
