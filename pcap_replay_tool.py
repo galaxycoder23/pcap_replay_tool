@@ -52,11 +52,11 @@ ssh = paramiko.SSHClient()
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # Automatically adds the hostname and new host key to the local HostKeys object, and saves it
 
 def print_stream(stream, identifier):  
-	for line in iter(stream.readline, ''):  
-	if line:
-		print(f"{identifier}: {line.strip()}")
-	else:  
-    break
+	for line in iter(stream.readline, ''):
+		if line:
+			print(f"{identifier}: {line.strip()}")
+		else:  
+    			break
 
 # SCP to transfer PCAP
 def upload_file_to_remote(local_file, remote_directory):
