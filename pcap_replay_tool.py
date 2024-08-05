@@ -3,6 +3,7 @@ import streamlit as st # For the app infrastucture itself
 import time # Used for the typewriter effect
 import paramiko # SSH from Python app
 from scp import SCPClient # SCP
+import threading # For multi-threading
 
 
 st.title("PCAP replay tool")
@@ -15,7 +16,7 @@ def stream_data():
 st.write_stream(stream_data)
 
 
-# Upload PCAP file
+# Allow user to upload PCAP file
 st.subheader("Upload PCAP:")
 filename = None
 remote_path = None
@@ -29,13 +30,13 @@ if file:
 # Adjust replay speed
 st.write("---")
 st.subheader("PCAP replay speed (in pps)")
-replay_speed = st.slider("How many packets would you like to replay per second?", 0.25, 200.0, 25.0)
+replay_speed = st.slider("How many packets would you like to replay per second?", 0.0, 2000.0, 500.0)
 st.write("---")
 
 
 # Display tcpreplay command to user
 st.subheader("Command you are running: ")
-replay_command = "sudo tcpreplay -i eth1 -vv " + "-p " + str(replay_speed) + " " + remote_path
+replay_command = "sudo -S tcpreplay -i eth1 -vv " + "-p " + str(replay_speed) + " " + remote_path
 st.code(replay_command, language="bash")
 
 	
@@ -49,34 +50,55 @@ ssh_password = st.secrets["password"]
 ssh = paramiko.SSHClient()  
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # Automatically adds the hostname and new host key to the local HostKeys object, and saves it
 
+def print_stream(stream, identifier):  
+    for line in iter(stream.readline, ''):  
+        if line:  
+            print(f"{identifier}: {line.strip()}")  
+        else:  
+            break
+
 # SCP to transfer PCAP
 def upload_file_to_remote(name, remote):
         with SCPClient(ssh.get_transport()) as scp:
                 full_local_path = st.secrets["filepath"] + name
                 scp.put(full_local_path, remote)
-                # Example Windows filepath: "C:/Users/<username>/Downloads/<filepath>"
 
 # Replay traffic
 def replay_traffic(ssh):
-        ssh.connect(ssh_host, port=ssh_port, username=ssh_user, password=ssh_password)
-        upload_file_to_remote(filename, remote_path)
-        global traffic_replay
-        stdin, stdout, stderr = ssh.exec_command(replay_command)
-        stdin.write(st.secrets["password"]+"\n")
-        stdin.flush()
-        st.write(stdout.read().decode())
-        traffic_replay = stdout.channel
-        ssh.close()
-	
+	try:
+		ssh.connect(ssh_host, port=ssh_port, username=ssh_user, password=ssh_password)
+		upload_file_to_remote(filename, remote_path)
+		global traffic_replay
+		stdin, stdout, stderr = ssh.exec_command(replay_command)
+		stdin.write(st.secrets["password"]+"\n")
+		stdin.flush()
+                
+		# Create threads to read stdout and stderr  
+		stdout_thread = threading.Thread(target=print_stream, args=(stdout, "STDOUT"))
+		stderr_thread = threading.Thread(target=print_stream, args=(stderr, "STDERR"))  
+          
+		# Start the threads  
+		stdout_thread.start()
+		stderr_thread.start()
+		
+		# Wait for the threads to complete
+		stdout_thread.join()
+		stderr_thread.join()
+		
+		traffic_replay = stdout.channel
+	finally:
+		ssh.close()
+
+
 if st.button("Start PCAP replay"):
 	replay_traffic(ssh)
 
 # Stop replay of traffic
 def stop_traffic(ssh):
-        ssh.connect(ssh_host, port=ssh_port, username=ssh_user, password=ssh_password)
-        if "traffic_replay" in globals():
-                ssh.exec_command(f"sudo kill {traffic_replay.get_id()}")
-        ssh.close()
-	
+	ssh.connect(ssh_host, port=ssh_port, username=ssh_user, password=ssh_password)
+	if "traffic_replay" in globals():
+		ssh.exec_command(f"sudo kill {traffic_replay.get_id()}")
+	ssh.close()
+
 if st.button("Stop PCAP replay", type="primary"):
 	stop_traffic(ssh)
