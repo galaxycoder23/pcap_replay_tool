@@ -5,9 +5,9 @@ import paramiko # SSH from Python app
 from scp import SCPClient # SCP
 import threading # For multi-threading
 
-
 st.title("PCAP replay tool")
 
+# Subtitle and typewriter formatting
 subtitle = "Replay PCAPs using tcpreplay"
 def stream_data():
 	for character in list(subtitle):
