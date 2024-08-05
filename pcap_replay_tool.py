@@ -35,7 +35,6 @@ st.write("---")
 
 # Display tcpreplay command to user
 st.subheader("Command you are running: ")
-st.write(remote_path)
 replay_command = "sudo tcpreplay -i eth1 -vv " + "-p " + str(replay_speed) + " " + remote_path
 st.code(replay_command, language="bash")
 
@@ -49,29 +48,35 @@ ssh_password = st.secrets["password"]
 # SSH setup
 ssh = paramiko.SSHClient()  
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # Automatically adds the hostname and new host key to the local HostKeys object, and saves it
-ssh.connect(ssh_host, port=ssh_port, username=ssh_user, password=ssh_password)
 
 # SCP to transfer PCAP
-with SCPClient(ssh.get_transport()) as scp:
-	full_local_path = st.secrets["filepath"] + filename
-	scp.put(full_local_path, remote_path)
-	# Example Windows filepath: "C:/Users/<username>/Downloads/<filepath>"
-
+def upload_file_to_remote(name, remote):
+        with SCPClient(ssh.get_transport()) as scp:
+                full_local_path = st.secrets["filepath"] + name
+                scp.put(full_local_path, remote)
+                # Example Windows filepath: "C:/Users/<username>/Downloads/<filepath>"
 
 # Replay traffic
 def replay_traffic(ssh):
-	global traffic_replay
-	stdin, stdout, stderr = ssh.exec_command(replay_command)
-	traffic_replay = stdout.channel
+        ssh.connect(ssh_host, port=ssh_port, username=ssh_user, password=ssh_password)
+        upload_file_to_remote(filename, remote_path)
+        global traffic_replay
+        stdin, stdout, stderr = ssh.exec_command(replay_command)
+        stdin.write(st.secrets["password"]+"\n")
+        stdin.flush()
+        st.write(stdout.read().decode())
+        traffic_replay = stdout.channel
+        ssh.close()
+	
 if st.button("Start PCAP replay"):
 	replay_traffic(ssh)
 
 # Stop replay of traffic
 def stop_traffic(ssh):
-	if "traffic_replay" in globals():  
-		ssh.exec_command(f"sudo kill {traffic_replay.get_id()}")
+        ssh.connect(ssh_host, port=ssh_port, username=ssh_user, password=ssh_password)
+        if "traffic_replay" in globals():
+                ssh.exec_command(f"sudo kill {traffic_replay.get_id()}")
+        ssh.close()
+	
 if st.button("Stop PCAP replay", type="primary"):
 	stop_traffic(ssh)
-
-
-ssh.close() # Closes SSH connection
