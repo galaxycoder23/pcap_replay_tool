@@ -32,18 +32,24 @@ filename = None
 remote_path = None
 multiple_files = False
 
+# Function to display tcpreplay command to user (called further down the page)
+def display_command():
+	if file_uploads:
+		st.subheader("Command you are running: ")
+		global replay_command 
+		replay_command = "sudo -S tcpreplay -i eth1 -vv " + "-p " + str(replay_speed) + " " + remote_path
+		st.code(replay_command, language="bash")
+		
 file_uploads = st.file_uploader("Upload files", type=(["pcap"]), accept_multiple_files=True, on_change=display_command)
 if file_uploads:
 	if len(file_uploads) == 1:
 		multiple_files = False
-		filename = file_uploads.name
+		filename = file_uploads[0].name
 	else:
 		multiple_files = True
 		for uploaded_file in file_uploads:
 			filename = "mergedpcap_" + now.strftime("%Y/%m/%Yd_%H:%M:%S") + ".pcap"
 	remote_path = "~/Documents/packet_captures/" + filename
-			
-
 
 # Adjust replay speed
 st.write("---")
@@ -51,14 +57,7 @@ st.subheader("PCAP replay speed (in pps)")
 replay_speed = st.slider("How many packets would you like to replay per second?", 0.0, 500.0, 100.0)
 st.write("---")
 
-
-# Display tcpreplay command to user
-def display_command():
-	if file_uploads:
-		st.subheader("Command you are running: ")
-		replay_command = "sudo -S tcpreplay -i eth1 -vv " + "-p " + str(replay_speed) + " " + remote_path
-		st.code(replay_command, language="bash")
-
+display_command()
 	
 # SSH credentials
 ssh_host = st.secrets["ip-address"]
