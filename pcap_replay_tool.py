@@ -8,7 +8,7 @@ import threading # For multi-threading
 import os # For use in deleting files
 
 st.set_page_config(
-   page_title="PCAP replay tool,
+   page_title="PCAP replay tool"
    page_icon="✨",
    layout="wide",
    initial_sidebar_state="expanded",
@@ -76,7 +76,7 @@ def print_stream(stream, identifier):
 		if line:
 			print(f"{identifier}: {line.strip()}")
 		else:  
-    	break
+    			break
 
 # SCP to transfer PCAP
 def upload_file_to_remote(local_file, remote_directory):
@@ -87,7 +87,7 @@ def upload_file_to_remote(local_file, remote_directory):
 # Replay traffic
 def replay_traffic(ssh):
 	try:
-		if multiple_files = False:
+		if multiple_files == False:
 			with open(filename, 'wb') as f: 
 				for uploaded_file in file_uploads:
 					f.write(uploaded_file.getvalue()) # For uploaded file as bytes
