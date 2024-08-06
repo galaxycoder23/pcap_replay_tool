@@ -6,6 +6,13 @@ from scp import SCPClient # SCP
 import threading # For multi-threading
 import os # For use in deleting files
 
+st.set_page_config(
+   page_title="PCAP replay tool,
+   page_icon="✨",
+   layout="wide",
+   initial_sidebar_state="expanded",
+)
+
 st.title("PCAP replay tool")
 
 # Subtitle and typewriter formatting
