@@ -30,7 +30,7 @@ file_upload = None
 filename = None
 remote_path = None
 
-file_upload = st.file_uploader("Upload a file", type=(["pcap"]))
+file_upload = st.file_uploader("Upload a file", type=(["pcap"]), accept_multiple_files=True, on_change(display_command))
 if file_upload:
 	filename = file_upload.name
 	remote_path = "~/Documents/packet_captures/" + filename
@@ -44,9 +44,11 @@ st.write("---")
 
 
 # Display tcpreplay command to user
-st.subheader("Command you are running: ")
-replay_command = "sudo -S tcpreplay -i eth1 -vv " + "-p " + str(replay_speed) + " " + remote_path
-st.code(replay_command, language="bash")
+def display_command():
+	if file_upload:
+		st.subheader("Command you are running: ")
+		replay_command = "sudo -S tcpreplay -i eth1 -vv " + "-p " + str(replay_speed) + " " + remote_path
+		st.code(replay_command, language="bash")
 
 	
 # SSH credentials
