@@ -10,7 +10,6 @@ import os # For use in deleting files
 st.set_page_config(
    page_title="PCAP replay tool",
    page_icon="✨",
-   layout="wide",
    initial_sidebar_state="expanded",
 )
 
@@ -37,7 +36,7 @@ file_uploads = st.file_uploader("Upload files", type=(["pcap"]), accept_multiple
 if file_uploads:
 	if len(file_uploads) == 1:
 		multiple_files = False
-		filename = file_upload.name
+		filename = file_uploads.name
 	else:
 		multiple_files = True
 		for uploaded_file in file_uploads:
