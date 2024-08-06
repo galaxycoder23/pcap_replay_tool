@@ -32,7 +32,7 @@ if file_upload:
 # Adjust replay speed
 st.write("---")
 st.subheader("PCAP replay speed (in pps)")
-replay_speed = st.slider("How many packets would you like to replay per second?", 0.0, 2000.0, 500.0)
+replay_speed = st.slider("How many packets would you like to replay per second?", 0.0, 500.0, 100.0)
 st.write("---")
 
 
