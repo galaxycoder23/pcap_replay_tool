@@ -33,7 +33,7 @@ filename = None
 remote_path = None
 multiple_files = False
 
-file_uploads = st.file_uploader("Upload files", type=(["pcap"]), accept_multiple_files=True, on_change(display_command))
+file_uploads = st.file_uploader("Upload files", type=(["pcap"]), accept_multiple_files=True, on_change=display_command)
 if file_uploads:
 	if len(file_uploads) == 1:
 		multiple_files = False
