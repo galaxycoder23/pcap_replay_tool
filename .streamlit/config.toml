@@ -1,2 +1,5 @@
 [server]
 maxUploadSize = 2048 # 2 GB
+
+[theme]
+base="dark" # Automatically loads the app in dark mode
