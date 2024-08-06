@@ -1,6 +1,7 @@
 # Imports
 import streamlit as st # For the app infrastucture itself
 import time # Used for the typewriter effect
+from datetime import date # To name merged PCAP
 import paramiko # SSH from Python app
 from scp import SCPClient # SCP
 import threading # For multi-threading
@@ -26,14 +27,23 @@ st.write_stream(stream_data)
 
 # Allow user to upload PCAP file
 st.subheader("Upload PCAP:")
+
 file_upload = None
 filename = None
 remote_path = None
+multiple_files = False
 
-file_upload = st.file_uploader("Upload a file", type=(["pcap"]), accept_multiple_files=True, on_change(display_command))
-if file_upload:
-	filename = file_upload.name
+file_uploads = st.file_uploader("Upload files", type=(["pcap"]), accept_multiple_files=True, on_change(display_command))
+if file_uploads:
+	if len(file_uploads) == 1:
+		multiple_files = False
+		filename = file_upload.name
+	else:
+		multiple_files = True
+		for uploaded_file in file_uploads:
+			filename = "mergedpcap_" + now.strftime("%Y/%m/%Yd_%H:%M:%S") + ".pcap"
 	remote_path = "~/Documents/packet_captures/" + filename
+			
 
 
 # Adjust replay speed
@@ -45,7 +55,7 @@ st.write("---")
 
 # Display tcpreplay command to user
 def display_command():
-	if file_upload:
+	if file_uploads:
 		st.subheader("Command you are running: ")
 		replay_command = "sudo -S tcpreplay -i eth1 -vv " + "-p " + str(replay_speed) + " " + remote_path
 		st.code(replay_command, language="bash")
@@ -66,18 +76,24 @@ def print_stream(stream, identifier):
 		if line:
 			print(f"{identifier}: {line.strip()}")
 		else:  
-    			break
+    	break
 
 # SCP to transfer PCAP
 def upload_file_to_remote(local_file, remote_directory):
 	with SCPClient(ssh.get_transport()) as scp:
 		scp.put(local_file, remote_directory)
 
+
 # Replay traffic
 def replay_traffic(ssh):
 	try:
-		with open(filename, 'wb') as f: 
-			f.write(file_upload.getvalue()) # For uploaded file as bytes
+		if multiple_files = False:
+			with open(filename, 'wb') as f: 
+				for uploaded_file in file_uploads:
+					f.write(uploaded_file.getvalue()) # For uploaded file as bytes
+		else:
+			with open(filename, 'wb') as f: 
+				f.write(file_uploads.getvalue()) # For uploaded file as bytes
 		ssh.connect(ssh_host, port=ssh_port, username=ssh_user, password=ssh_password)
 		upload_file_to_remote(filename, remote_path)
 		global traffic_replay
