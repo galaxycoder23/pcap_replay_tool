@@ -3,3 +3,6 @@ maxUploadSize = 2048 # 2 GB
 
 [theme]
 base="dark" # Automatically loads the app in dark mode
+
+[browser]
+gatherUsageStats = false # Disables the auto-collection of telemetry data
