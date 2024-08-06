@@ -1,7 +1,7 @@
 # Imports
 import streamlit as st # For the app infrastucture itself
 import time # Used for the typewriter effect
-from datetime import date # To name merged PCAP
+from datetime import datetime # To name merged PCAP
 import paramiko # SSH from Python app
 from scp import SCPClient # SCP
 import threading # For multi-threading
@@ -48,7 +48,7 @@ if file_uploads:
 	else:
 		multiple_files = True
 		for uploaded_file in file_uploads:
-			filename = "mergedpcap_" + now.strftime("%Y/%m/%Yd_%H:%M:%S") + ".pcap"
+			filename = "mergedpcap_" + datetime.now().strftime("%Y%m%d_%H%M%S") + ".pcap"
 	remote_path = "~/Documents/packet_captures/" + filename
 
 # Adjust replay speed
@@ -85,7 +85,7 @@ def upload_file_to_remote(local_file, remote_directory):
 # Replay traffic
 def replay_traffic(ssh):
 	try:
-		if multiple_files == False:
+		if multiple_files == True:
 			with open(filename, 'wb') as f: 
 				for uploaded_file in file_uploads:
 					f.write(uploaded_file.getvalue()) # For uploaded file as bytes
