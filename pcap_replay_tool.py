@@ -8,23 +8,23 @@ import threading # For multi-threading
 import os # For use in deleting files
 
 st.set_page_config(
-   page_title="PCAP replay tool",
+   page_title="Network traffic replay application",
    page_icon="✨"
 )
 
-st.title("PCAP replay tool")
+st.title("Network traffic replay application")
 
 # Subtitle and typewriter formatting
-subtitle = "Replay PCAPs using tcpreplay"
+subtitle = "Replay packet captures using tcpreplay"
 def stream_data():
 	for character in list(subtitle):
 		yield character + ""
-		time.sleep(0.02)
+		time.sleep(0.01)
 st.write_stream(stream_data)
 
 
-# Allow user to upload PCAP file
-st.subheader("Upload PCAP:")
+# Allow user to upload PCAP files
+st.subheader("Upload packet captures:")
 
 file_upload = None
 filename = None
@@ -52,7 +52,7 @@ if file_uploads:
 
 # Adjust replay speed
 st.write("---")
-st.subheader("PCAP replay speed (in pps)")
+st.subheader("Packet replay speed (in pps)")
 replay_speed = st.slider("How many packets would you like to replay per second?", 0.0, 500.0, 100.0)
 st.write("---")
 
@@ -116,7 +116,7 @@ def replay_traffic(ssh):
 			os.remove(filename)
 		ssh.close()
 
-if st.button("Start PCAP replay"):
+if st.button("Start traffic replay"):
 	replay_traffic(ssh)
 
 
@@ -129,5 +129,5 @@ def stop_traffic(ssh):
 		os.remove(filename)
 	ssh.close()
 
-if st.button("Stop PCAP replay", type="primary"):
+if st.button("Stop traffic replay", type="primary"):
 	stop_traffic(ssh)
