@@ -51,7 +51,8 @@ if file_uploads:
 	with open(filename, 'wb') as f: 
 		for uploaded_file in file_uploads:
 			f.write(uploaded_file.getvalue()) # For uploaded file as bytes
-		st.download_button("Download PCAP", f)
+	with open(filename) as saved_file:
+		st.download_button("Download PCAP", saved_file)
 	remote_path = "~/Documents/packet_captures/" + filename
 
 	
