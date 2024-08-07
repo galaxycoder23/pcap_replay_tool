@@ -9,8 +9,7 @@ import os # For use in deleting files
 
 st.set_page_config(
    page_title="PCAP replay tool",
-   page_icon="✨",
-   initial_sidebar_state="expanded",
+   page_icon="✨"
 )
 
 st.title("PCAP replay tool")
