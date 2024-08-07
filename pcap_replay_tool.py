@@ -30,7 +30,6 @@ st.subheader("Upload PCAP:")
 file_upload = None
 filename = None
 remote_path = None
-multiple_files = False
 
 # Function to display tcpreplay command to user (called further down the page)
 def display_command():
@@ -39,17 +38,24 @@ def display_command():
 		global replay_command 
 		replay_command = "sudo -S tcpreplay -i eth1 -vv " + "-p " + str(replay_speed) + " " + remote_path
 		st.code(replay_command, language="bash")
+
+	
 		
 file_uploads = st.file_uploader("Upload files", type=(["pcap"]), accept_multiple_files=True, on_change=display_command)
 if file_uploads:
 	if len(file_uploads) == 1:
-		multiple_files = False
 		filename = file_uploads[0].name
 	else:
-		multiple_files = True
 		for uploaded_file in file_uploads:
 			filename = "mergedpcap_" + datetime.now().strftime("%Y%m%d_%H%M%S") + ".pcap"
+			with open(filename) as merged_file:
+   				st.download_button("Download merged PCAP", merged_file)
+	with open(filename, 'wb') as f: 
+		for uploaded_file in file_uploads:
+			f.write(uploaded_file.getvalue()) # For uploaded file as bytes
 	remote_path = "~/Documents/packet_captures/" + filename
+
+	
 
 # Adjust replay speed
 st.write("---")
@@ -85,13 +91,6 @@ def upload_file_to_remote(local_file, remote_directory):
 # Replay traffic
 def replay_traffic(ssh):
 	try:
-		if multiple_files == True:
-			with open(filename, 'wb') as f: 
-				for uploaded_file in file_uploads:
-					f.write(uploaded_file.getvalue()) # For uploaded file as bytes
-		else:
-			with open(filename, 'wb') as f: 
-				f.write(file_uploads.getvalue()) # For uploaded file as bytes
 		ssh.connect(ssh_host, port=ssh_port, username=ssh_user, password=ssh_password)
 		upload_file_to_remote(filename, remote_path)
 		global traffic_replay
