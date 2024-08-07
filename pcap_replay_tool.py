@@ -45,14 +45,18 @@ file_uploads = st.file_uploader("Upload files", type=(["pcap"]), accept_multiple
 if file_uploads:
 	if len(file_uploads) == 1:
 		filename = file_uploads[0].name
+		with open(filename, "wb") as f: 
+		for uploaded_file in file_uploads:
+			f.write(uploaded_file.getvalue()) # For uploaded file as bytes
+			st.download_button("Download PCAP", uploaded_file.getvalue(), file_name=filename, mime="application/vnd.tcpdump.pcap")
 	else:
 		for uploaded_file in file_uploads:
 			filename = "mergedpcap_" + datetime.now().strftime("%Y%m%d_%H%M%S") + ".pcap"
-	with open(filename, "wb") as f: 
-		for uploaded_file in file_uploads:
-			f.write(uploaded_file.getvalue()) # For uploaded file as bytes
-	with open(filename, "rb") as saved_file:
-		st.download_button("Download PCAP", saved_file, file_name=filename, mime="application/vnd.tcpdump.pcap")
+		with open(filename, "wb") as f: 
+			for uploaded_file in file_uploads:
+				f.write(uploaded_file.getvalue()) # For uploaded file as bytes
+		with open(filename, "rb") as merged_file:
+			st.download_button("Download merged PCAP", merged_file, file_name=filename, mime="application/vnd.tcpdump.pcap")
 	remote_path = "~/Documents/packet_captures/" + filename
 
 	
