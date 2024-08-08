@@ -33,9 +33,9 @@ remote_path = None
 # Function to display tcpreplay command to user (called further down the page)
 def display_command():
 	if file_uploads:
-		st.subheader("Command you will be run: ")
+		st.subheader("Command that will be run: ")
 		global replay_command 
-		replay_command = "sudo -S tcpreplay -i eth1 -vv " + "-p " + str(replay_speed) + " " + remote_path
+		replay_command = "sudo -S tcpreplay -i eth1 -vv" + str(replay_speed) + " " + remote_path
 		st.code(replay_command, language="bash")
 
 	
@@ -62,8 +62,15 @@ if file_uploads:
 
 # Adjust replay speed
 st.write("---")
-st.subheader("Packet replay speed (in pps)")
-replay_speed = st.slider("How many packets would you like to replay per second?", 0.0, 500.0, 100.0)
+st.subheader("Packet capture replay speed")
+option = st.selectbox("What speed would you like to replay the packet capture at?", ["x0.5", "Normal", "x2", "x3", "x4", "x8", "Top speed"])
+if option == "Normal":
+	replay_speed = ""
+elif option == "Top speed":
+	replay_speed = " -t"
+else:
+	multiplier = option[1:]
+	replay_speed = " -x " + multiplier
 st.write("---")
 
 display_command()
