@@ -33,7 +33,7 @@ remote_path = None
 # Function to display tcpreplay command to user (called further down the page)
 def display_command():
 	if file_uploads:
-		st.subheader("Command you will be run: ")
+		st.subheader("Command that will be run: ")
 		global replay_command 
 		replay_command = "sudo -S tcpreplay -i eth1 -vv " + "-p " + str(replay_speed) + " " + remote_path
 		st.code(replay_command, language="bash")
