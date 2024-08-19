@@ -38,10 +38,9 @@ def display_command():
 		replay_command = "sudo -S tcpreplay -i eth1 -vv " + "-p " + str(replay_speed) + " " + remote_path
 		st.code(replay_command, language="bash")
 
-def delete_files(filenames):
-	for filename in filenames:
-		if os.path.exists("./upload_folder/"/+filename):
-				os.remove("./upload_folder/"+filename)
+def delete_files():
+	if os.path.exists("./upload_folder/"):
+		os.remove("./upload_folder/")
 		
 file_uploads = st.file_uploader("Upload files", type=(["pcap"]), accept_multiple_files=True, on_change=display_command)
 if file_uploads:
@@ -61,7 +60,7 @@ if file_uploads:
 				f.write(uploaded_file.getvalue()) # For uploaded file as bytes
 		with open("./upload_folder/"+filename, "rb") as merged_file:
 			st.download_button("Download merged PCAP", merged_file, file_name=filename, mime="application/vnd.tcpdump.pcap")
-		st.button("Delete all uploaded PCAPs", on_click=delete_files(file_uploads.append(merged_file)))
+		st.button("Delete all uploaded PCAPs", on_click=delete_files()
 	remote_path = "~/Documents/packet_captures/" + filename
 
 	
