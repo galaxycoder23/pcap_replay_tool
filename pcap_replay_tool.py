@@ -94,7 +94,7 @@ def print_stream(stream, identifier):
 # SCP to transfer PCAP
 def upload_file_to_remote(local_file, remote_directory):
 	with SCPClient(ssh.get_transport()) as scp:
-		scp.put(local_file, remote_directory)
+		scp.put("./upload_folder/"+local_file, remote_directory)
 
 
 # Replay traffic
