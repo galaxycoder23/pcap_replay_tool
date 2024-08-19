@@ -121,7 +121,7 @@ def replay_traffic(ssh):
 		
 		traffic_replay = stdout.channel
 	finally:
-		delete_file()
+		delete_files()
 		ssh.close()
 
 if st.button("Start traffic replay"):
@@ -133,7 +133,7 @@ def stop_traffic(ssh):
 	ssh.connect(ssh_host, port=ssh_port, username=ssh_user, password=ssh_password)
 	if "traffic_replay" in globals():
 		ssh.exec_command(f"sudo kill {traffic_replay.get_id()}")
-	delete_file()
+	delete_files()
 	ssh.close()
 
 if st.button("Stop traffic replay", type="primary"):
