@@ -61,7 +61,7 @@ if file_uploads:
 				f.write(uploaded_file.getvalue()) # For uploaded file as bytes
 		with open("./upload_folder/"+filename, "rb") as merged_file:
 			st.download_button("Download merged PCAP", merged_file, file_name=filename, mime="application/vnd.tcpdump.pcap")
-		st.button("Delete all uploaded PCAPs", on_click=delete_files())
+	st.button("Delete all uploaded PCAPs", on_click=delete_files())
 	remote_path = "~/Documents/packet_captures/" + filename
 
 	
