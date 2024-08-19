@@ -5,7 +5,8 @@ from datetime import datetime # To name merged PCAP
 import paramiko # SSH from Python app
 from scp import SCPClient # SCP
 import threading # For multi-threading
-import os # For use in deleting files
+import os # To create the upload folder
+import shutil # For use in deleting files
 
 st.set_page_config(
    page_title="Network traffic replay application",
@@ -40,7 +41,7 @@ def display_command():
 
 def delete_files():
 	if os.path.exists("./upload_folder/"):
-		os.remove("./upload_folder/")
+		shutil.rmtree("./upload_folder/")
 		
 file_uploads = st.file_uploader("Upload files", type=(["pcap"]), accept_multiple_files=True, on_change=display_command)
 if file_uploads:
