@@ -8,6 +8,16 @@ import threading # For multi-threading
 import os # To create the upload folder
 import shutil # For use in deleting files
 
+# SSH credentials
+ssh_host = st.secrets["ip-address"]
+ssh_port = 22  
+ssh_user = st.secrets["username"]
+ssh_password = st.secrets["password"]  
+
+# SSH setup
+ssh = paramiko.SSHClient()  
+ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # Automatically adds the hostname and new host key to the local HostKeys object, and saves it
+
 st.set_page_config(
    page_title="Network traffic replay application",
    page_icon="✨"
@@ -22,7 +32,6 @@ def stream_data():
 		yield character + ""
 		time.sleep(0.01)
 st.write_stream(stream_data)
-
 
 # Allow user to upload PCAP files
 st.subheader("Upload packet captures:")
@@ -40,8 +49,13 @@ def display_command():
 		st.code(replay_command, language="bash")
 
 def delete_files():
+	# Windows
 	if os.path.exists("./upload_folder/"):
 		shutil.rmtree("./upload_folder/")
+	# Linux
+	ssh.connect(ssh_host, port=ssh_port, username=ssh_user, password=ssh_password)
+	stdin, stdout, stderr = ssh.exec_command("rm ~/Documents/packet_captures/*")
+	stdin.flush()
 		
 file_uploads = st.file_uploader("Upload files", type=(["pcap"]), accept_multiple_files=True, on_change=display_command)
 if file_uploads:
@@ -61,10 +75,8 @@ if file_uploads:
 				f.write(uploaded_file.getvalue()) # For uploaded file as bytes
 		with open("./upload_folder/"+filename, "rb") as merged_file:
 			st.download_button("Download merged PCAP", merged_file, file_name=filename, mime="application/vnd.tcpdump.pcap")
-	st.button("Delete all uploaded PCAPs", on_click=delete_files())
 	remote_path = "~/Documents/packet_captures/" + filename
 
-	
 
 # Adjust replay speed
 st.write("---")
@@ -80,16 +92,6 @@ else:
 st.write("---")
 
 display_command()
-	
-# SSH credentials
-ssh_host = st.secrets["ip-address"]
-ssh_port = 22  
-ssh_user = st.secrets["username"]
-ssh_password = st.secrets["password"]  
-
-# SSH setup
-ssh = paramiko.SSHClient()  
-ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # Automatically adds the hostname and new host key to the local HostKeys object, and saves it
 
 def print_stream(stream, identifier):  
 	for line in iter(stream.readline, ''):
@@ -102,7 +104,6 @@ def print_stream(stream, identifier):
 def upload_file_to_remote(local_file, remote_directory):
 	with SCPClient(ssh.get_transport()) as scp:
 		scp.put("./upload_folder/"+local_file, remote_directory)
-
 
 # Replay traffic
 def replay_traffic(ssh):
@@ -143,5 +144,5 @@ def stop_traffic(ssh):
 	delete_files()
 	ssh.close()
 
-if st.button("Stop traffic replay", type="primary"):
+if st.button("Stop traffic replay and delete files", type="primary"):
 	stop_traffic(ssh)
