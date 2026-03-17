@@ -1,24 +1,25 @@
-# GUI tool for PCAP replay
+# GUI tool for packet capture replay using tcpreplay
 
 Run the following commands in PowerShell, Command Prompt, or a terminal of your choice.
 
 ---
-# Installation instructions (for Windows)
+# Installation instructions
 
 ## Install required dependencies
 ```
-py -m pip install -r requirements.txt
-```
-## Validate Streamlit installation
-```
-py -m streamlit hello
+pip install -r requirements.txt
 ```
 
-# Run app
+## Validate Streamlit installation
 ```
-py -m streamlit run pcap_replay_tool.py
+streamlit hello
+```
+
+# Run application
+```
+streamlit run pcap_replay_tool.py
 ```
 
 ---
 
-If Python is within the terminal's environment variables, you can remove `py -m` from the start of the command.
+**NB: If Python is not within the terminal's environment variables, you can prepend `py -m` to the start of each command.**
