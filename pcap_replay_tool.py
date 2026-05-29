@@ -9,7 +9,7 @@ import os # To create the upload folder
 import shutil # For use in deleting files
 
 # SSH credentials
-ssh_host = st.secrets["ip-address"]
+ssh_host = st.secrets["ip_address"]
 ssh_port = 22  
 ssh_user = st.secrets["username"]
 ssh_password = st.secrets["password"]  
@@ -114,10 +114,12 @@ def replay_traffic():
 	client.exec_command("mkdir -p ~/Documents/packet_captures")
 	try:
 		upload_file_to_remote(filename, remote_path, client)
-		global traffic_replay
 		stdin, stdout, stderr = client.exec_command(replay_command)
 		stdin.write(st.secrets["password"]+"\n")
 		stdin.flush()
+		time.sleep(0.5)
+		_, pid_out, _ = ssh.exec_command("pgrep tcpreplay")
+		st.session_state["replay_pid"] = pid_out.read().decode().strip()
                 
 		# Create threads to read stdout and stderr  
 		stdout_thread = threading.Thread(target=print_stream, args=(stdout, "STDOUT"))
@@ -131,7 +133,6 @@ def replay_traffic():
 		stdout_thread.join()
 		stderr_thread.join()
 		
-		traffic_replay = stdout.channel
 	finally:
 		delete_files()
 		client.close()
@@ -143,8 +144,8 @@ if st.button("Start traffic replay"):
 # Stop replay of traffic
 def stop_traffic():
 	client = get_ssh()
-	if "traffic_replay" in globals():
-		ssh.exec_command(f"sudo kill {traffic_replay.get_id()}")
+	if "replay_pid" in st.session_state:
+		ssh.exec_command(f"sudo kill {st.session_state['replay_pid']}")
 	client.close()
 	delete_files()
 
