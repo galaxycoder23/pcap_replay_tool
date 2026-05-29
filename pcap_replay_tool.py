@@ -110,10 +110,12 @@ def replay_traffic(ssh):
 	try:
 		ssh.connect(ssh_host, port=ssh_port, username=ssh_user, password=ssh_password)
 		upload_file_to_remote(filename, remote_path)
-		global traffic_replay
 		stdin, stdout, stderr = ssh.exec_command(replay_command)
 		stdin.write(st.secrets["password"]+"\n")
 		stdin.flush()
+		time.sleep(0.5)
+		_, pid_out, _ = ssh.exec_command("pgrep tcpreplay")
+		st.session_state["replay_pid"] = pid_out.read().decode().strip()
                 
 		# Create threads to read stdout and stderr  
 		stdout_thread = threading.Thread(target=print_stream, args=(stdout, "STDOUT"))
@@ -127,7 +129,6 @@ def replay_traffic(ssh):
 		stdout_thread.join()
 		stderr_thread.join()
 		
-		traffic_replay = stdout.channel
 	finally:
 		delete_files()
 		ssh.close()
@@ -139,8 +140,8 @@ if st.button("Start traffic replay"):
 # Stop replay of traffic
 def stop_traffic(ssh):
 	ssh.connect(ssh_host, port=ssh_port, username=ssh_user, password=ssh_password)
-	if "traffic_replay" in globals():
-		ssh.exec_command(f"sudo kill {traffic_replay.get_id()}")
+	if "replay_pid" in st.session_state:
+    	ssh.exec_command(f"sudo kill {st.session_state['replay_pid']}")
 	delete_files()
 	ssh.close()
 
