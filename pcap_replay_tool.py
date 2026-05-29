@@ -126,7 +126,9 @@ def replay_traffic():
 		client.close()
 
 if st.button("Start traffic replay"):
-	replay_traffic()
+	t = threading.Thread(target=replay_traffic)
+	t.daemon = True
+	t.start()
 
 
 # Stop replay of traffic
