@@ -132,7 +132,6 @@ def replay_traffic():
 		# Wait for the threads to complete
 		stdout_thread.join()
 		stderr_thread.join()
-		
 	finally:
 		delete_files()
 		client.close()
