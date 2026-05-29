@@ -144,7 +144,7 @@ if st.button("Start traffic replay"):
 def stop_traffic():
 	client = get_ssh()
 	if "replay_pid" in st.session_state:
-		ssh.exec_command(f"sudo kill {st.session_state['replay_pid']}")
+		client.exec_command(f"sudo kill {st.session_state['replay_pid']}")
 	client.close()
 	delete_files()
 
