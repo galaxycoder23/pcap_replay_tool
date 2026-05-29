@@ -15,8 +15,11 @@ ssh_user = st.secrets["username"]
 ssh_password = st.secrets["password"]  
 
 # SSH setup
-ssh = paramiko.SSHClient()  
-ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # Automatically adds the hostname and new host key to the local HostKeys object, and saves it
+def get_ssh():
+    client = paramiko.SSHClient()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    client.connect(ssh_host, port=ssh_port, username=ssh_user, password=ssh_password)
+    return client
 
 st.set_page_config(
    page_title="Network traffic replay application",
@@ -53,9 +56,9 @@ def delete_files():
 	if os.path.exists("./upload_folder/"):
 		shutil.rmtree("./upload_folder/")
 	# Linux
-	ssh.connect(ssh_host, port=ssh_port, username=ssh_user, password=ssh_password)
-	stdin, stdout, stderr = ssh.exec_command("rm ~/Documents/packet_captures/*")
-	stdin.flush()
+	client = get_ssh()
+    client.exec_command("rm ~/Documents/packet_captures/*")
+    client.close()
 		
 file_uploads = st.file_uploader("Upload files", type=(["pcap"]), accept_multiple_files=True, on_change=display_command)
 if file_uploads:
@@ -101,12 +104,13 @@ def print_stream(stream, identifier):
     			break
 
 # SCP to transfer PCAP
-def upload_file_to_remote(local_file, remote_directory):
-	with SCPClient(ssh.get_transport()) as scp:
+def upload_file_to_remote(local_file, remote_directory, client):
+	with SCPClient(client.get_transport()) as scp:
 		scp.put("./upload_folder/"+local_file, remote_directory)
 
 # Replay traffic
-def replay_traffic(ssh):
+def replay_traffic():
+	client = get_ssh()
 	try:
 		ssh.connect(ssh_host, port=ssh_port, username=ssh_user, password=ssh_password)
 		upload_file_to_remote(filename, remote_path)
@@ -130,19 +134,20 @@ def replay_traffic(ssh):
 		traffic_replay = stdout.channel
 	finally:
 		delete_files()
-		ssh.close()
+		client.close()
 
 if st.button("Start traffic replay"):
-	replay_traffic(ssh)
+	replay_traffic()
 
 
 # Stop replay of traffic
-def stop_traffic(ssh):
-	ssh.connect(ssh_host, port=ssh_port, username=ssh_user, password=ssh_password)
+def stop_traffic():
+	client = get_ssh()
 	if "traffic_replay" in globals():
 		ssh.exec_command(f"sudo kill {traffic_replay.get_id()}")
+	client.close()
 	delete_files()
-	ssh.close()
+	
 
 if st.button("Stop traffic replay and delete files", type="primary"):
-	stop_traffic(ssh)
+	stop_traffic()
