@@ -42,6 +42,7 @@ st.subheader("Upload packet captures:")
 file_upload = None
 filename = None
 remote_path = None
+replay_pid = None
 
 # Function to display tcpreplay command to user (called further down the page)
 def display_command():
@@ -119,7 +120,8 @@ def replay_traffic():
 		stdin.flush()
 		time.sleep(0.5)
 		_, pid_out, _ = client.exec_command("pgrep tcpreplay")
-		st.session_state["replay_pid"] = pid_out.read().decode().strip()
+		global replay_pid
+		replay_pid = pid_out.read().decode().strip()
 		stdout.channel.recv_exit_status()
 	finally:
 		delete_files()
@@ -134,8 +136,8 @@ if st.button("Start traffic replay"):
 # Stop replay of traffic
 def stop_traffic():
 	client = get_ssh()
-	if "replay_pid" in st.session_state:
-		stdin, stdout, stderr = client.exec_command(f"sudo -S kill {st.session_state['replay_pid']}")
+	if replay_pid:
+		stdin, stdout, stderr = client.exec_command(f"sudo -S kill {replay_pid}")
 		stdin.write(st.secrets["password"]+"\n")
 		stdin.flush()
 	client.close()
