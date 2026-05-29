@@ -119,10 +119,11 @@ def replay_traffic():
 		stdin.write(st.secrets["password"]+"\n")
 		stdin.flush()
 		time.sleep(0.5)
-		_, pid_out, _ = client.exec_command("pgrep tcpreplay")
+		pid_client = get_ssh()
+		_, pid_out, _ = pid_client.exec_command("pgrep tcpreplay")
 		global replay_pid
 		replay_pid = pid_out.read().decode().strip()
-		stdout.channel.recv_exit_status()
+		pid_client.close()
 	finally:
 		delete_files()
 		client.close()
