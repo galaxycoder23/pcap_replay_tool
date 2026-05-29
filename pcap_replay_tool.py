@@ -111,6 +111,7 @@ def upload_file_to_remote(local_file, remote_directory, client):
 # Replay traffic
 def replay_traffic():
 	client = get_ssh()
+	client.exec_command("mkdir -p ~/Documents/packet_captures")
 	try:
 		upload_file_to_remote(filename, remote_path, client)
 		global traffic_replay
