@@ -48,7 +48,7 @@ def display_command():
 	if file_uploads:
 		st.subheader("Command that will be run: ")
 		global replay_command 
-		replay_command = "sudo -S tcpreplay -i eth1 -vv" + str(replay_speed) + " " + remote_path
+		replay_command = "sudo -S tcpreplay -i eth1 -vv" + str(replay_speed) + " " + remote_path + " > /tmp/tcpreplay.log 2>&1"
 		st.code(replay_command, language="bash")
 
 def delete_files():
@@ -120,18 +120,7 @@ def replay_traffic():
 		time.sleep(0.5)
 		_, pid_out, _ = client.exec_command("pgrep tcpreplay")
 		st.session_state["replay_pid"] = pid_out.read().decode().strip()
-                
-		# Create threads to read stdout and stderr  
-		stdout_thread = threading.Thread(target=print_stream, args=(stdout, "STDOUT"))
-		stderr_thread = threading.Thread(target=print_stream, args=(stderr, "STDERR"))  
-          
-		# Start the threads  
-		stdout_thread.start()
-		stderr_thread.start()
-		
-		# Wait for the threads to complete
-		stdout_thread.join()
-		stderr_thread.join()
+		stdout.channel.recv_exit_status()
 	finally:
 		delete_files()
 		client.close()
