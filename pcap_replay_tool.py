@@ -118,7 +118,7 @@ def replay_traffic():
 		stdin.write(st.secrets["password"]+"\n")
 		stdin.flush()
 		time.sleep(0.5)
-		_, pid_out, _ = ssh.exec_command("pgrep tcpreplay")
+		_, pid_out, _ = client.exec_command("pgrep tcpreplay")
 		st.session_state["replay_pid"] = pid_out.read().decode().strip()
                 
 		# Create threads to read stdout and stderr  
