@@ -147,7 +147,6 @@ def stop_traffic():
 		ssh.exec_command(f"sudo kill {traffic_replay.get_id()}")
 	client.close()
 	delete_files()
-	
 
 if st.button("Stop traffic replay and delete files", type="primary"):
 	stop_traffic()
