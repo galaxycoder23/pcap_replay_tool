@@ -9,7 +9,7 @@ import os # To create the upload folder
 import shutil # For use in deleting files
 
 # SSH credentials
-ssh_host = st.secrets["ip-address"]
+ssh_host = st.secrets["ip_address"]
 ssh_port = 22  
 ssh_user = st.secrets["username"]
 ssh_password = st.secrets["password"]  
