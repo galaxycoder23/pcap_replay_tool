@@ -97,13 +97,6 @@ st.write("---")
 
 display_command()
 
-def print_stream(stream, identifier):  
-	for line in iter(stream.readline, ''):
-		if line:
-			print(f"{identifier}: {line.strip()}")
-		else:  
-    			break
-
 # SCP to transfer PCAP
 def upload_file_to_remote(local_file, remote_directory, client):
 	with SCPClient(client.get_transport()) as scp:
@@ -124,6 +117,7 @@ def replay_traffic():
 		global replay_pid
 		replay_pid = pid_out.read().decode().strip()
 		pid_client.close()
+		stdout.channel.recv_exit_status()
 	finally:
 		delete_files()
 		client.close()
