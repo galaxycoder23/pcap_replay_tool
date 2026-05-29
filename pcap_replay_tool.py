@@ -114,7 +114,7 @@ def replay_traffic():
 	try:
 		upload_file_to_remote(filename, remote_path, client)
 		global traffic_replay
-		stdin, stdout, stderr = ssh.exec_command(replay_command)
+		stdin, stdout, stderr = client.exec_command(replay_command)
 		stdin.write(st.secrets["password"]+"\n")
 		stdin.flush()
                 
