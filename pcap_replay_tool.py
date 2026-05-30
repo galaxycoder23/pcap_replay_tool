@@ -1,18 +1,18 @@
 # Imports
-import streamlit as st  # For the app infrastucture itself
 import time  # Used for the typewriter effect
 from datetime import datetime  # To name merged PCAP
-import paramiko  # SSH from Python app
-from scp import SCPClient  # SCP
 import threading  # For multi-threading
 import os  # To create the upload folder
 import shutil  # For use in deleting files
+import streamlit as st  # For the app infrastucture itself
+import paramiko  # SSH from Python app
+from scp import SCPClient  # SCP
 
 # SSH credentials
 ssh_host = st.secrets["ip_address"]
-ssh_port = 22
-ssh_user = st.secrets["username"]
-ssh_password = st.secrets["password"]
+SSH_PORT = 22
+SSH_USER = st.secrets["username"]
+SSH_PASSWORD = st.secrets["password"]
 
 
 # SSH setup
@@ -21,7 +21,7 @@ def get_ssh():
     client.set_missing_host_key_policy(
         paramiko.AutoAddPolicy()
     )  # Automatically adds the hostname and new host key to the local HostKeys object, and saves it
-    client.connect(ssh_host, port=ssh_port, username=ssh_user, password=ssh_password)
+    client.connect(ssh_host, port=SSH_PORT, username=SSH_USER, password=SSH_PASSWORD)
     return client
 
 
@@ -80,7 +80,7 @@ file_uploads = st.file_uploader(
     on_change=display_command,
 )
 if file_uploads:
-    if not (os.path.exists("./upload_folder/")):
+    if not os.path.exists("./upload_folder/"):
         os.mkdir("./upload_folder/")
     if len(file_uploads) == 1:
         filename = file_uploads[0].name
@@ -171,7 +171,7 @@ def stop_traffic():
     if os.path.exists("./replay_pid.txt"):
         with open("./replay_pid.txt", "r") as f:
             pid = f.read().strip()
-        stdin, stdout, stderr = client.exec_command(f"sudo -S kill {pid}", get_pty=True)
+        stdin, stdout, _ = client.exec_command(f"sudo -S kill {pid}", get_pty=True)
         stdin.write(st.secrets["password"] + "\n")
         stdin.flush()
         stdout.read()
