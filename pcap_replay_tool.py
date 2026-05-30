@@ -21,8 +21,9 @@ SSH_PASSWORD = st.secrets["password"]
 def get_ssh():
     """Create and return an SSH client connected to the target machine."""
     client = paramiko.SSHClient()
+    client.load_system_host_keys()
     client.set_missing_host_key_policy(
-        paramiko.AutoAddPolicy()
+        paramiko.RejectPolicy()
     )  # Automatically adds the hostname and new host key to the local HostKeys object, and saves it
     client.connect(SSH_HOST, port=SSH_PORT, username=SSH_USER, password=SSH_PASSWORD)
     return client
