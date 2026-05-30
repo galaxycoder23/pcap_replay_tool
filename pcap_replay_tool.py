@@ -39,7 +39,6 @@ st.write_stream(stream_data)
 # Allow user to upload PCAP files
 st.subheader("Upload packet captures:")
 
-file_upload = None
 filename = None
 remote_path = None
 
