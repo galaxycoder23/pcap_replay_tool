@@ -9,7 +9,7 @@ import os # To create the upload folder
 import shutil # For use in deleting files
 
 # SSH credentials
-ssh_host = st.secrets["ip-address"]
+ssh_host = st.secrets["ip_address"]
 ssh_port = 22  
 ssh_user = st.secrets["username"]
 ssh_password = st.secrets["password"]  
@@ -48,7 +48,7 @@ def display_command():
 	if file_uploads:
 		st.subheader("Command that will be run: ")
 		global replay_command 
-		replay_command = "sudo -S tcpreplay -i eth1 -vv" + str(replay_speed) + " " + remote_path
+		replay_command = "sudo -S tcpreplay -i eth1 -vv" + str(replay_speed) + " " + remote_path + " > /tmp/tcpreplay.log 2>&1"
 		st.code(replay_command, language="bash")
 
 def delete_files():
@@ -57,8 +57,8 @@ def delete_files():
 		shutil.rmtree("./upload_folder/")
 	# Linux
 	client = get_ssh()
-    client.exec_command("rm ~/Documents/packet_captures/*")
-    client.close()
+	client.exec_command("rm ~/Documents/packet_captures/*")
+	client.close()
 		
 file_uploads = st.file_uploader("Upload files", type=(["pcap"]), accept_multiple_files=True, on_change=display_command)
 if file_uploads:
@@ -96,13 +96,6 @@ st.write("---")
 
 display_command()
 
-def print_stream(stream, identifier):  
-	for line in iter(stream.readline, ''):
-		if line:
-			print(f"{identifier}: {line.strip()}")
-		else:  
-    			break
-
 # SCP to transfer PCAP
 def upload_file_to_remote(local_file, remote_directory, client):
 	with SCPClient(client.get_transport()) as scp:
@@ -114,37 +107,37 @@ def replay_traffic():
 	client.exec_command("mkdir -p ~/Documents/packet_captures")
 	try:
 		upload_file_to_remote(filename, remote_path, client)
-		global traffic_replay
 		stdin, stdout, stderr = client.exec_command(replay_command)
 		stdin.write(st.secrets["password"]+"\n")
 		stdin.flush()
-                
-		# Create threads to read stdout and stderr  
-		stdout_thread = threading.Thread(target=print_stream, args=(stdout, "STDOUT"))
-		stderr_thread = threading.Thread(target=print_stream, args=(stderr, "STDERR"))  
-          
-		# Start the threads  
-		stdout_thread.start()
-		stderr_thread.start()
-		
-		# Wait for the threads to complete
-		stdout_thread.join()
-		stderr_thread.join()
-		
-		traffic_replay = stdout.channel
+		time.sleep(0.5)
+		pid_client = get_ssh()
+		_, pid_out, _ = pid_client.exec_command("pgrep tcpreplay")
+		pid = pid_out.read().decode().strip()
+		with open("./replay_pid.txt", "w") as f:
+			f.write(pid)
+		pid_client.close()
+		stdout.channel.recv_exit_status()
 	finally:
 		delete_files()
 		client.close()
 
 if st.button("Start traffic replay"):
-	replay_traffic()
-
+	t = threading.Thread(target=replay_traffic)
+	t.daemon = True
+	t.start()
 
 # Stop replay of traffic
 def stop_traffic():
 	client = get_ssh()
-	if "traffic_replay" in globals():
-		ssh.exec_command(f"sudo kill {traffic_replay.get_id()}")
+	if os.path.exists("./replay_pid.txt"):
+		with open("./replay_pid.txt", "r") as f:
+			pid = f.read().strip()
+		stdin, stdout, stderr = client.exec_command(f"sudo -S kill {pid}", get_pty=True)
+		stdin.write(st.secrets["password"]+"\n")
+		stdin.flush()
+		stdout.read()
+		os.remove("./replay_pid.txt")
 	client.close()
 	delete_files()
 
