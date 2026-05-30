@@ -48,7 +48,7 @@ def display_command():
 	if file_uploads:
 		st.subheader("Command that will be run: ")
 		global replay_command 
-		replay_command = "sudo -S tcpreplay -i eth1 -vv" + str(replay_speed) + " " + remote_path
+		replay_command = "sudo -S tcpreplay -i eth1 -vv" + str(replay_speed) + " " + remote_path + " > /tmp/tcpreplay.log 2>&1"
 		st.code(replay_command, language="bash")
 
 def delete_files():
@@ -96,13 +96,6 @@ st.write("---")
 
 display_command()
 
-def print_stream(stream, identifier):  
-	for line in iter(stream.readline, ''):
-		if line:
-			print(f"{identifier}: {line.strip()}")
-		else:  
-    			break
-
 # SCP to transfer PCAP
 def upload_file_to_remote(local_file, remote_directory, client):
 	with SCPClient(client.get_transport()) as scp:
@@ -118,33 +111,28 @@ def replay_traffic():
 		stdin.write(st.secrets["password"]+"\n")
 		stdin.flush()
 		time.sleep(0.5)
-		_, pid_out, _ = client.exec_command("pgrep tcpreplay")
+		pid_client = get_ssh()
+		_, pid_out, _ = pid_client.exec_command("pgrep tcpreplay")
 		st.session_state["replay_pid"] = pid_out.read().decode().strip()
-                
-		# Create threads to read stdout and stderr  
-		stdout_thread = threading.Thread(target=print_stream, args=(stdout, "STDOUT"))
-		stderr_thread = threading.Thread(target=print_stream, args=(stderr, "STDERR"))  
-          
-		# Start the threads  
-		stdout_thread.start()
-		stderr_thread.start()
-		
-		# Wait for the threads to complete
-		stdout_thread.join()
-		stderr_thread.join()
+		pid_client.close()
+		stdout.channel.recv_exit_status()
 	finally:
 		delete_files()
 		client.close()
 
 if st.button("Start traffic replay"):
-	replay_traffic()
-
+	t = threading.Thread(target=replay_traffic)
+	t.daemon = True
+	t.start()
 
 # Stop replay of traffic
 def stop_traffic():
 	client = get_ssh()
 	if "replay_pid" in st.session_state:
-		client.exec_command(f"sudo kill {st.session_state['replay_pid']}")
+	    pid = st.session_state["replay_pid"]
+	    stdin, stdout, stderr = client.exec_command(f"sudo -S kill {pid}")
+		stdin.write(st.secrets["password"]+"\n")
+		stdin.flush()
 	client.close()
 	delete_files()
 
