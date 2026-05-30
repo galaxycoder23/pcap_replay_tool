@@ -85,7 +85,7 @@ file_uploads = st.file_uploader(
     on_change=display_command,
 )
 if file_uploads:
-    if not (os.path.exists("./upload_folder/")):
+    if not os.path.exists("./upload_folder/"):
         os.mkdir("./upload_folder/")
     if len(file_uploads) == 1:
         filename = file_uploads[0].name
