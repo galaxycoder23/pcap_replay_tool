@@ -130,7 +130,7 @@ def stop_traffic():
 	client = get_ssh()
 	if "replay_pid" in st.session_state:
 	    pid = st.session_state["replay_pid"]
-	    stdin, stdout, stderr = client.exec_command(f"sudo -S kill {pid}"
+	    stdin, stdout, stderr = client.exec_command(f"sudo -S kill {pid}")
 		stdin.write(st.secrets["password"]+"\n")
 		stdin.flush()
 	client.close()
