@@ -47,7 +47,6 @@ st.subheader("Upload packet captures:")
 
 filename = None
 remote_path = None
-replay_command = ""
 replay_speed = ""
 
 
@@ -56,15 +55,14 @@ def display_command():
     """Display tcpreplay command to user"""
     if file_uploads:
         st.subheader("Command that will be run: ")
-        global replay_command
-        replay_command = (
+        st.session_state["replay_command"] = (
             "sudo -S tcpreplay -i eth1 -vv"
             + str(replay_speed)
             + " "
             + remote_path
             + " > /tmp/tcpreplay.log 2>&1"
         )
-        st.code(replay_command, language="bash")
+        st.code(st.session_state["replay_command"], language="bash")
 
 
 def delete_files():
@@ -150,7 +148,7 @@ def replay_traffic():
     client.exec_command("mkdir -p ~/Documents/packet_captures")
     try:
         upload_file_to_remote(filename, remote_path, client)
-        stdin, stdout, _ = client.exec_command(replay_command)
+        stdin, stdout, _ = client.exec_command(st.session_state["replay_command"])
         stdin.write(st.secrets["password"] + "\n")
         stdin.flush()
         time.sleep(0.5)
