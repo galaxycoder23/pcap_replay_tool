@@ -121,6 +121,11 @@ def replay_traffic():
 		delete_files()
 		client.close()
 
+if os.path.exists("./replay_pid.txt"):
+    st.warning("⚠️ Replay in progress...")
+else:
+    st.success("✅ No replay running")
+
 if st.button("Start traffic replay", disabled=os.path.exists("./replay_pid.txt")):
 	t = threading.Thread(target=replay_traffic)
 	t.daemon = True
