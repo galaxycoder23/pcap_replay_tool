@@ -84,7 +84,7 @@ if file_uploads:
 # Adjust replay speed
 st.write("---")
 st.subheader("Packet capture replay speed")
-option = st.selectbox("What speed would you like to replay the packet capture at?", ["x0.5", "Normal", "x2", "x3", "x4", "x8", "Top speed"])
+option = st.selectbox("What speed would you like to replay the packet capture at?", ["x0.5", "Normal", "x2", "x3", "x4", "x8", "Top speed"], index=1)
 if option == "Normal":
 	replay_speed = ""
 elif option == "Top speed":
