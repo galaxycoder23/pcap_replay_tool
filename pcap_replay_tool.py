@@ -1,3 +1,5 @@
+"""GUI tool for packet capture replay using the tcpreplay utility."""
+
 # Imports
 import time  # Used for the typewriter effect
 from datetime import datetime  # To name merged PCAP
@@ -17,6 +19,7 @@ SSH_PASSWORD = st.secrets["password"]
 
 # SSH setup
 def get_ssh():
+    """Create and return an SSH client connected to the target machine."""
     client = paramiko.SSHClient()
     client.set_missing_host_key_policy(
         paramiko.AutoAddPolicy()
@@ -30,16 +33,14 @@ st.set_page_config(page_title="Network traffic replay application", page_icon="â
 st.title("Network traffic replay application")
 
 # Subtitle and typewriter formatting
-subtitle = "Replay packet captures using tcpreplay"
-
-
-def stream_data():
-    for character in list(subtitle):
+def stream_data(string):
+    """Create typewriter-style text on screen."""
+    for character in list(string):
         yield character + ""
         time.sleep(0.01)
 
+st.write_stream(stream_data("Replay packet captures using tcpreplay"))
 
-st.write_stream(stream_data)
 
 # Allow user to upload PCAP files
 st.subheader("Upload packet captures:")
@@ -50,6 +51,7 @@ remote_path = None
 
 # Function to display tcpreplay command to user (called further down the page)
 def display_command():
+    """Display tcpreplay command to user"""
     if file_uploads:
         st.subheader("Command that will be run: ")
         global replay_command
@@ -64,6 +66,7 @@ def display_command():
 
 
 def delete_files():
+    """Delete files which are no longer required once the tcpreplay process is finished/terminated"""
     # Windows
     if os.path.exists("./upload_folder/"):
         shutil.rmtree("./upload_folder/")
@@ -133,12 +136,14 @@ display_command()
 
 # SCP to transfer PCAP
 def upload_file_to_remote(local_file, remote_directory, client):
+    """Transfer file from local machine to remote machine using SCP"""
     with SCPClient(client.get_transport()) as scp:
         scp.put("./upload_folder/" + local_file, remote_directory)
 
 
 # Replay traffic
 def replay_traffic():
+    """Replay traffic using the tcpreplay utility"""
     client = get_ssh()
     client.exec_command("mkdir -p ~/Documents/packet_captures")
     try:
@@ -150,8 +155,8 @@ def replay_traffic():
         pid_client = get_ssh()
         _, pid_out, _ = pid_client.exec_command("pgrep tcpreplay")
         pid = pid_out.read().decode().strip()
-        with open("./replay_pid.txt", "w") as f:
-            f.write(pid)
+        with open("./replay_pid.txt", "w", encoding="utf-8") as pid_file:
+            pid_file.write(pid)
         pid_client.close()
         stdout.channel.recv_exit_status()
     finally:
@@ -167,10 +172,11 @@ if st.button("Start traffic replay"):
 
 # Stop replay of traffic
 def stop_traffic():
+    """Terminate tcpreplay process"""
     client = get_ssh()
     if os.path.exists("./replay_pid.txt"):
-        with open("./replay_pid.txt", "r") as f:
-            pid = f.read().strip()
+        with open("./replay_pid.txt", "r", encoding="utf-8") as pid_file:
+            pid = pid_file.read().strip()
         stdin, stdout, _ = client.exec_command(f"sudo -S kill {pid}", get_pty=True)
         stdin.write(st.secrets["password"] + "\n")
         stdin.flush()
