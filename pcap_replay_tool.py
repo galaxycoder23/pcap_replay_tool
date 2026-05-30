@@ -121,7 +121,7 @@ def replay_traffic():
 		delete_files()
 		client.close()
 
-if st.button("Start traffic replay"):
+if st.button("Start traffic replay", disabled=os.path.exists("./replay_pid.txt")):
 	t = threading.Thread(target=replay_traffic)
 	t.daemon = True
 	t.start()
