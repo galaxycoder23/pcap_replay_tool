@@ -32,12 +32,14 @@ st.set_page_config(page_title="Network traffic replay application", page_icon="�
 
 st.title("Network traffic replay application")
 
+
 # Subtitle and typewriter formatting
 def stream_data(string):
     """Create typewriter-style text on screen."""
     for character in list(string):
         yield character + ""
         time.sleep(0.01)
+
 
 st.write_stream(stream_data("Replay packet captures using tcpreplay"))
 
@@ -167,7 +169,12 @@ def replay_traffic():
         client.close()
 
 
-if st.button("Start traffic replay"):
+if os.path.exists("./replay_pid.txt"):
+    st.warning("⚠️ Replay in progress...")
+else:
+    st.success("✅ No replay running")
+
+if st.button("Start traffic replay", disabled=os.path.exists("./replay_pid.txt")):
     t = threading.Thread(target=replay_traffic)
     t.daemon = True
     t.start()
