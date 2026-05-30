@@ -11,7 +11,7 @@ import paramiko  # SSH from Python app
 from scp import SCPClient  # SCP
 
 # SSH credentials
-ssh_host = st.secrets["ip_address"]
+SSH_HOST = st.secrets["ip_address"]
 SSH_PORT = 22
 SSH_USER = st.secrets["username"]
 SSH_PASSWORD = st.secrets["password"]
@@ -24,7 +24,7 @@ def get_ssh():
     client.set_missing_host_key_policy(
         paramiko.AutoAddPolicy()
     )  # Automatically adds the hostname and new host key to the local HostKeys object, and saves it
-    client.connect(ssh_host, port=SSH_PORT, username=SSH_USER, password=SSH_PASSWORD)
+    client.connect(SSH_HOST, port=SSH_PORT, username=SSH_USER, password=SSH_PASSWORD)
     return client
 
 
@@ -32,12 +32,14 @@ st.set_page_config(page_title="Network traffic replay application", page_icon="�
 
 st.title("Network traffic replay application")
 
+
 # Subtitle and typewriter formatting
 def stream_data(string):
     """Create typewriter-style text on screen."""
     for character in list(string):
         yield character + ""
         time.sleep(0.01)
+
 
 st.write_stream(stream_data("Replay packet captures using tcpreplay"))
 
@@ -112,7 +114,6 @@ if file_uploads:
             )
     remote_path = "~/Documents/packet_captures/" + filename
 
-
 # Specify network interface
 st.write("---")
 st.subheader("Network interface")
@@ -170,7 +171,12 @@ def replay_traffic():
         client.close()
 
 
-if st.button("Start traffic replay"):
+if os.path.exists("./replay_pid.txt"):
+    st.warning("⚠️ Replay in progress...")
+else:
+    st.success("✅ No replay running")
+
+if st.button("Start traffic replay", disabled=os.path.exists("./replay_pid.txt")):
     t = threading.Thread(target=replay_traffic)
     t.daemon = True
     t.start()
