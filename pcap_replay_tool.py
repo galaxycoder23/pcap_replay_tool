@@ -70,6 +70,8 @@ def delete_files():
     # Windows
     if os.path.exists("./upload_folder/"):
         shutil.rmtree("./upload_folder/")
+    if os.path.exists("./replay_pid.txt"):
+        os.remove("./replay_pid.txt")
     # Linux
     client = get_ssh()
     client.exec_command("rm ~/Documents/packet_captures/*")
@@ -181,7 +183,6 @@ def stop_traffic():
         stdin.write(st.secrets["password"] + "\n")
         stdin.flush()
         stdout.read()
-        os.remove("./replay_pid.txt")
     client.close()
     delete_files()
 
