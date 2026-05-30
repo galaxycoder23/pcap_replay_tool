@@ -47,6 +47,8 @@ st.subheader("Upload packet captures:")
 
 filename = None
 remote_path = None
+replay_command = ""
+replay_speed = ""
 
 
 # Function to display tcpreplay command to user (called further down the page)
@@ -66,7 +68,7 @@ def display_command():
 
 
 def delete_files():
-    """Delete files which are no longer required once the tcpreplay process is finished/terminated"""
+    """Delete files which are no longer required once the tcpreplay process is complete"""
     # Windows
     if os.path.exists("./upload_folder/"):
         shutil.rmtree("./upload_folder/")
@@ -148,7 +150,7 @@ def replay_traffic():
     client.exec_command("mkdir -p ~/Documents/packet_captures")
     try:
         upload_file_to_remote(filename, remote_path, client)
-        stdin, stdout, stderr = client.exec_command(replay_command)
+        stdin, stdout, _ = client.exec_command(replay_command)
         stdin.write(st.secrets["password"] + "\n")
         stdin.flush()
         time.sleep(0.5)
