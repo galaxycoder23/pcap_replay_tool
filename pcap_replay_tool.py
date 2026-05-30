@@ -57,8 +57,8 @@ def delete_files():
 		shutil.rmtree("./upload_folder/")
 	# Linux
 	client = get_ssh()
-    client.exec_command("rm ~/Documents/packet_captures/*")
-    client.close()
+	client.exec_command("rm ~/Documents/packet_captures/*")
+	client.close()
 		
 file_uploads = st.file_uploader("Upload files", type=(["pcap"]), accept_multiple_files=True, on_change=display_command)
 if file_uploads:
@@ -133,7 +133,7 @@ def stop_traffic():
 	if os.path.exists("./replay_pid.txt"):
 		with open("./replay_pid.txt", "r") as f:
 			pid = f.read().strip()
-	    stdin, stdout, stderr = client.exec_command(f"sudo -S kill {pid}", get_pty=True)
+		stdin, stdout, stderr = client.exec_command(f"sudo -S kill {pid}", get_pty=True)
 		stdin.write(st.secrets["password"]+"\n")
 		stdin.flush()
 		stdout.read()
