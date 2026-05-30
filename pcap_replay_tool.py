@@ -49,6 +49,7 @@ st.subheader("Upload packet captures:")
 
 filename = None
 remote_path = None
+network_interface = ""
 replay_speed = ""
 
 
@@ -57,15 +58,11 @@ def display_command():
     """Display tcpreplay command to user"""
     if file_uploads:
         st.subheader("Command that will be run: ")
+        command = f"sudo -S tcpreplay -i {network_interface} -vv{replay_speed} {remote_path}"
         st.session_state["replay_command"] = (
-            "sudo -S tcpreplay -i eth1 -vv"
-            + str(replay_speed)
-            + " "
-            + remote_path
-            + " > /tmp/tcpreplay.log 2>&1"
+            f"{command} > /tmp/tcpreplay.log 2>&1"
         )
         st.code(st.session_state["replay_command"], language="bash")
-
 
 def delete_files():
     """Delete files which are no longer required once the tcpreplay process is complete"""
@@ -117,8 +114,15 @@ if file_uploads:
             )
     remote_path = "~/Documents/packet_captures/" + filename
 
-# Adjust replay speed
+# Specify network interface
 st.write("---")
+st.subheader("Network interface")
+network_interface = st.text_input(
+    "What network interface would you like to replay the traffic over? e.g. eth0, eth1", "eth1"
+)
+st.write("---")
+
+# Adjust replay speed
 st.subheader("Packet capture replay speed")
 option = st.selectbox(
     "What speed would you like to replay the packet capture at?",
