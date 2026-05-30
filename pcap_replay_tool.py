@@ -11,7 +11,7 @@ import paramiko  # SSH from Python app
 from scp import SCPClient  # SCP
 
 # SSH credentials
-ssh_host = st.secrets["ip_address"]
+SSH_HOST = st.secrets["ip_address"]
 SSH_PORT = 22
 SSH_USER = st.secrets["username"]
 SSH_PASSWORD = st.secrets["password"]
@@ -24,7 +24,7 @@ def get_ssh():
     client.set_missing_host_key_policy(
         paramiko.AutoAddPolicy()
     )  # Automatically adds the hostname and new host key to the local HostKeys object, and saves it
-    client.connect(ssh_host, port=SSH_PORT, username=SSH_USER, password=SSH_PASSWORD)
+    client.connect(SSH_HOST, port=SSH_PORT, username=SSH_USER, password=SSH_PASSWORD)
     return client
 
 
@@ -101,8 +101,8 @@ if file_uploads:
                     mime="application/vnd.tcpdump.pcap",
                 )
     else:
+        filename = st.text_input("Enter a name for the merged PCAP:")
         for uploaded_file in file_uploads:
-            filename = st.text_input("Enter a name for the merged PCAP:")
             if not filename:
                 filename = "mergedpcap_" + datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = filename + ".pcap"
