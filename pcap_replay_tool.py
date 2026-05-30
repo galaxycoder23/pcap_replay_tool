@@ -125,7 +125,6 @@ if st.button("Start traffic replay"):
 	t.daemon = True
 	t.start()
 
-
 # Stop replay of traffic
 def stop_traffic():
 	client = get_ssh()
