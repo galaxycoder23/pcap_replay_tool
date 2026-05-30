@@ -113,7 +113,9 @@ def replay_traffic():
 		time.sleep(0.5)
 		pid_client = get_ssh()
 		_, pid_out, _ = pid_client.exec_command("pgrep tcpreplay")
-		st.session_state["replay_pid"] = pid_out.read().decode().strip()
+		pid = pid_out.read().decode().strip()
+		with open("./replay_pid.txt", "w") as f:
+			f.write(pid)
 		pid_client.close()
 		stdout.channel.recv_exit_status()
 	finally:
@@ -128,11 +130,14 @@ if st.button("Start traffic replay"):
 # Stop replay of traffic
 def stop_traffic():
 	client = get_ssh()
-	if "replay_pid" in st.session_state:
-	    pid = st.session_state["replay_pid"]
-	    stdin, stdout, stderr = client.exec_command(f"sudo -S kill {pid}")
+	if os.path.exists("./replay_pid.txt"):
+		with open("./replay_pid.txt", "r") as f:
+			pid = f.read().strip()
+	    stdin, stdout, stderr = client.exec_command(f"sudo -S kill {pid}", get_pty=True)
 		stdin.write(st.secrets["password"]+"\n")
 		stdin.flush()
+		stdout.read().decode(()
+		os.remove("./replay_pid.txt")
 	client.close()
 	delete_files()
 
