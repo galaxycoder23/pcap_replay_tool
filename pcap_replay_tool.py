@@ -136,7 +136,7 @@ def stop_traffic():
 	    stdin, stdout, stderr = client.exec_command(f"sudo -S kill {pid}", get_pty=True)
 		stdin.write(st.secrets["password"]+"\n")
 		stdin.flush()
-		stdout.read().decode(()
+		stdout.read()
 		os.remove("./replay_pid.txt")
 	client.close()
 	delete_files()
