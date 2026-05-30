@@ -71,7 +71,10 @@ if file_uploads:
 				st.download_button("Download PCAP", uploaded_file.getvalue(), file_name=filename, mime="application/vnd.tcpdump.pcap")
 	else:
 		for uploaded_file in file_uploads:
-			filename = "mergedpcap_" + datetime.now().strftime("%Y%m%d_%H%M%S") + ".pcap"
+			filename = st.text_input("Enter a name for the merged PCAP:")
+			if not filename:
+				filename = "mergedpcap_" + datetime.now().strftime("%Y%m%d_%H%M%S")
+			filename = filename + ".pcap"
 		with open("./upload_folder/"+filename, "wb") as f: 
 			for uploaded_file in file_uploads:
 				f.write(uploaded_file.getvalue()) # For uploaded file as bytes
